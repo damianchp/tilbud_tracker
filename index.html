@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TilbudTracker — This week's best prices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14171A; --surface:#1B1F24; --surface-2:#232830; --raise:#2A3038;
+    --paper:#EDEFE9; --ink:#ECEEF0; --muted:#8A9099; --muted-2:#5C636C;
+    --led:#4AFF8C; --led-dim:#2E9E5C; --cyan:#5FD4E8; --alert:#FF6B5C;
+    --line:#2E333A; --line-strong:#3A4048;
+    --radius:12px; --radius-sm:8px;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; padding-bottom:calc(72px + var(--safe-bottom));
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:var(--sans); margin:0;}
+  button{font-family:var(--sans); cursor:pointer;}
+  input,select{font-family:var(--sans);}
+  .mono{font-family:var(--mono);}
+  a{color:var(--cyan);}
+
+  /* ---------- header ---------- */
+  .app-header{padding:22px 16px 14px; text-align:center; border-bottom:1px dashed var(--line-strong); position:relative;}
+  .app-header .lang-toggle{position:absolute; top:14px; right:14px; display:flex; border:1px solid var(--line-strong); border-radius:14px; overflow:hidden;}
+  .app-header .lang-toggle button{background:var(--surface-2); border:none; color:var(--muted); font-family:var(--mono); font-size:10px; font-weight:700; padding:5px 9px;}
+  .app-header .lang-toggle button.on{background:var(--led); color:#0B140D;}
+  .app-header .lang-toggle button+button{border-left:1px solid var(--line-strong);}
+  .app-header .wordmark{font-family:var(--mono); letter-spacing:.22em; text-transform:uppercase; font-size:11px; color:var(--muted-2);}
+  .app-header h1{font-weight:700; font-size:21px; margin:.3rem 0 .15rem;}
+  .app-header .meta{font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;}
+  .dealer-chip{display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:20px; font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.02em;}
+  .dealer-strip{display:flex; gap:6px; justify-content:center; margin-top:10px; flex-wrap:wrap;}
+
+  .banner{margin:12px 16px 0; padding:10px 12px; border-radius:var(--radius-sm); font-size:12.5px; line-height:1.4; display:flex; gap:8px; align-items:flex-start;}
+  .banner.demo{background:rgba(95,212,232,.1); border:1px solid rgba(95,212,232,.35); color:var(--cyan);}
+  .banner.warn{background:rgba(255,107,92,.1); border:1px solid rgba(255,107,92,.35); color:var(--alert);}
+  .banner button.dismiss{background:none;border:none;color:inherit;font-size:11px;text-decoration:underline;padding:0;margin-left:auto;flex-shrink:0;}
+
+  main{max-width:640px; margin:0 auto; padding:0 12px;}
+  .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:20px 4px 10px;}
+  .empty-state{padding:32px 16px; text-align:center; color:var(--muted); font-size:14px; line-height:1.5;}
+  .empty-state button{margin-top:12px;}
+
+  /* ---------- buttons ---------- */
+  .btn{border-radius:var(--radius-sm); border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink); padding:9px 14px; font-size:13.5px; font-weight:600; transition:transform .08s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn.primary{background:var(--led); border-color:var(--led); color:#0B140D;}
+  .btn.ghost{background:transparent; border-color:var(--line-strong); color:var(--muted);}
+  .btn.danger{background:transparent; border-color:var(--alert); color:var(--alert);}
+  .btn.small{padding:5px 10px; font-size:12px;}
+  .btn.block{width:100%;}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  /* ---------- offer card ---------- */
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-bottom:10px; position:relative; animation:riseIn .25s ease both;}
+  @keyframes riseIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .card{animation:none;} }
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .card-name{font-size:15px; font-weight:600; line-height:1.3;}
+  .card-sub{font-size:11.5px; color:var(--muted); font-family:var(--mono); margin-top:2px;}
+  .stamp{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 7px; border-radius:5px; border:2px solid; transform:rotate(-5deg); white-space:nowrap; flex-shrink:0;}
+  .stamp.excellent{color:var(--led); border-color:var(--led);}
+  .stamp.good{color:var(--cyan); border-color:var(--cyan);}
+  .stamp.normal{color:var(--muted); border-color:var(--muted-2);}
+  .stamp.weak{color:var(--alert); border-color:var(--alert);}
+  .stamp.unknown{color:var(--muted-2); border-color:var(--line-strong);}
+  .stamp.due{color:var(--alert); border-color:var(--alert); transform:rotate(4deg);}
+
+  .price-row{display:flex; align-items:baseline; gap:10px; margin-top:10px; flex-wrap:wrap;}
+  .price-big{font-family:var(--mono); font-weight:700; font-size:26px; color:var(--led); letter-spacing:-.01em;}
+  .price-pre{font-family:var(--mono); font-size:13px; color:var(--muted-2); text-decoration:line-through;}
+  .unit-price{font-family:var(--mono); font-size:11.5px; color:var(--muted);}
+
+  .card-actions{display:flex; gap:8px; margin-top:12px; align-items:center;}
+  .card-actions .btn{flex:1;}
+  .caret-btn{background:none; border:none; color:var(--muted); font-size:12px; padding:6px; flex:0 0 auto; font-family:var(--mono);}
+
+  .alt-table{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line-strong); font-size:12.5px;}
+  .alt-row{display:flex; justify-content:space-between; padding:4px 0; color:var(--muted);}
+  .alt-row .dealer-chip{font-size:9px;}
+  .alt-row .delta{font-family:var(--mono);}
+
+  .sparkline{margin-top:8px; display:block;}
+
+  /* ---------- tabs ---------- */
+  .tabbar{position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--line-strong); display:flex; padding-bottom:var(--safe-bottom); z-index:50;}
+  .tabbar button{flex:1; background:none; border:none; color:var(--muted); padding:10px 4px 8px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; letter-spacing:.02em;}
+  .tabbar button.active{color:var(--led);}
+  .tabbar svg{width:20px; height:20px;}
+
+  /* ---------- misc components ---------- */
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+  .field input[type=text], .field input[type=number], .field select{
+    width:100%; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink);
+    padding:10px 12px; border-radius:var(--radius-sm); font-size:14px;
+  }
+  .row{display:flex; gap:10px;}
+  .row > *{flex:1;}
+  .chip-toggle{display:inline-flex; align-items:center; padding:8px 12px; border-radius:20px; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--muted); font-size:12.5px; margin:3px 4px 3px 0; user-select:none;}
+  .chip-toggle.on{background:rgba(74,255,140,.12); border-color:var(--led); color:var(--led);}
+  .cat-group{margin-bottom:16px;}
+  .cat-group h4{font-size:12px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted-2); margin:0 0 8px 2px;}
+
+  .basket-dealer{margin-bottom:16px;}
+  .basket-dealer-head{display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid var(--line-strong);}
+  .basket-line{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px dashed var(--line);}
+  .basket-line .name{flex:1; font-size:13.5px;}
+  .basket-line .qty-ctl{display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:13px;}
+  .basket-line .qty-ctl button{width:22px; height:22px; border-radius:5px; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink); font-size:13px; line-height:1;}
+  .basket-line .line-total{font-family:var(--mono); font-weight:600; font-size:13.5px; min-width:64px; text-align:right;}
+  .basket-line select.dealer-move{background:var(--surface-2); color:var(--muted); border:1px solid var(--line); border-radius:6px; font-size:10.5px; padding:2px 4px;}
+  .totals-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:14px 0;}
+  .totals-row{display:flex; justify-content:space-between; padding:5px 0; font-size:13.5px;}
+  .totals-row.grand{font-size:17px; font-weight:700; font-family:var(--mono); border-top:1px dashed var(--line-strong); margin-top:6px; padding-top:10px;}
+  .totals-row .save{color:var(--led);}
+
+  .suggest-box{background:rgba(95,212,232,.08); border:1px solid rgba(95,212,232,.3); border-radius:var(--radius-sm); padding:10px 12px; font-size:12.5px; color:var(--cyan); margin-bottom:12px; line-height:1.4;}
+
+  .list-item{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px dashed var(--line);}
+  .list-item .grow{flex:1;}
+  .list-item .name{font-size:13.5px; font-weight:600;}
+  .list-item .sub{font-size:11.5px; color:var(--muted); font-family:var(--mono); margin-top:2px;}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; display:flex; align-items:flex-end; justify-content:center;}
+  .modal{background:var(--bg); width:100%; max-width:640px; max-height:88vh; overflow-y:auto; border-radius:16px 16px 0 0; padding:18px 16px calc(20px + var(--safe-bottom));}
+  .modal h2{font-size:17px; margin-bottom:4px;}
+  .modal .step-sub{font-size:12.5px; color:var(--muted); margin-bottom:14px;}
+
+  .footer-actions{display:flex; gap:8px; margin:26px 0 10px; padding:0 4px;}
+  .footer-note{text-align:center; font-size:11px; color:var(--muted-2); padding:6px 16px 20px; line-height:1.5;}
+
+  .bar-chart{width:100%; height:140px;}
+  .segmented{display:flex; border:1px solid var(--line-strong); border-radius:var(--radius-sm); overflow:hidden;}
+  .segmented button{flex:1; background:var(--surface-2); border:none; color:var(--muted); padding:8px 4px; font-size:12px; font-weight:600;}
+  .segmented button.on{background:var(--led); color:#0B140D;}
+  .segmented button + button{border-left:1px solid var(--line-strong);}
+
+  /* ---------- quick add / FAB ---------- */
+  .fab{position:fixed; right:14px; bottom:calc(74px + var(--safe-bottom)); background:var(--led); color:#0B140D; border:none; border-radius:24px; padding:12px 16px; font-weight:700; font-size:12.5px; box-shadow:0 4px 16px rgba(0,0,0,.45); display:flex; align-items:center; gap:6px; z-index:60;}
+  .fab svg{width:16px; height:16px;}
+  .fab:active{transform:scale(.96);}
+  .basket-line .src-tag{font-size:10px; color:var(--muted-2); font-family:var(--mono); margin-top:1px;}
+  .basket-line .name-wrap{flex:1;}
+  .price-unknown{color:var(--muted-2); font-style:italic;}
+  .remove-x{background:none; border:none; color:var(--muted-2); font-size:15px; padding:2px 4px; flex-shrink:0;}
+  .andet-note{font-size:11px; color:var(--muted); margin:-4px 0 8px 4px;}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script id="embedded-catalog" type="application/json">{"_readme":"This is the shared matching dictionary, committed to the repo. It has NO concept of 'favorite' — that lives per-user in the browser's localStorage (see index.html / tt_state.favorites), so everyone who deploys this app gets their own picks without touching this file. Add new products here when the unmatched-candidates review (My Products tab) surfaces something worth tracking long-term; day-to-day personalization never requires editing this file.","products":[{"canonical_id":"milk-whole","display_name":"Sødmælk","category":"dairy","compare_basis":"kr/l","default_cadence_days":7,"match_terms":["sødmælk"],"exclude_terms":["minimælk","skummet","kakaomælk"]},{"canonical_id":"milk-skimmed-organic","display_name":"Skummetmælk, øko","category":"dairy","compare_basis":"kr/l","default_cadence_days":7,"match_terms":["øko skummetmælk","økologisk skummetmælk"],"exclude_terms":[]},{"canonical_id":"butter-lurpak-salted","display_name":"Lurpak smør, saltet","category":"dairy","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["lurpak smør","lurpak saltet"],"exclude_terms":["smørbar","let","letsaltet"]},{"canonical_id":"yoghurt-natural","display_name":"Yoghurt naturel","category":"dairy","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["yoghurt naturel","tykmælk"],"exclude_terms":["sukret","vanilje"]},{"canonical_id":"skyr-natural","display_name":"Skyr, naturel","category":"dairy","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["skyr naturel","skyr 0%"],"exclude_terms":[]},{"canonical_id":"cheese-danbo","display_name":"Danbo ost","category":"dairy","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["danbo"],"exclude_terms":[]},{"canonical_id":"eggs-10","display_name":"Æg, 10 stk","category":"dairy","compare_basis":"kr/stk","default_cadence_days":7,"match_terms":["æg 10","æg m10","friland æg"],"exclude_terms":[]},{"canonical_id":"creme-fraiche","display_name":"Crème fraîche, 18%","category":"dairy","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["creme fraiche","crème fraîche"],"exclude_terms":["let","9%"]},{"canonical_id":"chicken-whole","display_name":"Kylling, hel","category":"meat","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["hel kylling","grillkylling"],"exclude_terms":["bryst","lår"]},{"canonical_id":"chicken-breast","display_name":"Kyllingebryst","category":"meat","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["kyllingebryst","kyllingefilet"],"exclude_terms":[]},{"canonical_id":"beef-minced-8-12","display_name":"Hakket oksekød, 8-12%","category":"meat","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["hakket oksekød 8-12","hakket oksekød 10%","hakket okse 8-12"],"exclude_terms":["3-7%","kalv"]},{"canonical_id":"pork-minced","display_name":"Hakket svinekød","category":"meat","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["hakket svinekød","hakket flæsk"],"exclude_terms":[]},{"canonical_id":"bacon","display_name":"Bacon, skiver","category":"meat","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["bacon"],"exclude_terms":["kalkun"]},{"canonical_id":"salmon-fillet","display_name":"Laksefilet","category":"fish","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["laksefilet","laks filet"],"exclude_terms":["røget"]},{"canonical_id":"bread-rye","display_name":"Rugbrød","category":"bakery","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["rugbrød"],"exclude_terms":["knækbrød"]},{"canonical_id":"bread-wheat","display_name":"Franskbrød / toastbrød","category":"bakery","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["franskbrød","toastbrød","flütes"],"exclude_terms":[]},{"canonical_id":"banana","display_name":"Bananer","category":"produce","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["bananer"],"exclude_terms":["økologisk bananer"]},{"canonical_id":"apple","display_name":"Æbler","category":"produce","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["æbler"],"exclude_terms":[]},{"canonical_id":"avocado","display_name":"Avocado","category":"produce","compare_basis":"kr/stk","default_cadence_days":7,"match_terms":["avocado"],"exclude_terms":[]},{"canonical_id":"tomato","display_name":"Tomater","category":"produce","compare_basis":"kr/kg","default_cadence_days":7,"match_terms":["tomater","cherrytomater"],"exclude_terms":["dåse","flåede"]},{"canonical_id":"cucumber","display_name":"Agurk","category":"produce","compare_basis":"kr/stk","default_cadence_days":7,"match_terms":["agurk"],"exclude_terms":[]},{"canonical_id":"onion","display_name":"Løg","category":"produce","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["gule løg","kartoffelløg"],"exclude_terms":["rødløg","forårsløg"]},{"canonical_id":"potato","display_name":"Kartofler","category":"produce","compare_basis":"kr/kg","default_cadence_days":14,"match_terms":["kartofler"],"exclude_terms":["pomfritter"]},{"canonical_id":"lime","display_name":"Limefrugt","category":"produce","compare_basis":"kr/stk","default_cadence_days":14,"match_terms":["lime"],"exclude_terms":[]},{"canonical_id":"coriander","display_name":"Koriander, frisk","category":"produce","compare_basis":"kr/stk","default_cadence_days":14,"match_terms":["koriander"],"exclude_terms":[]},{"canonical_id":"coffee-filter","display_name":"Filterkaffe","category":"pantry","compare_basis":"kr/kg","default_cadence_days":21,"match_terms":["gevalia","merrild","filterkaffe"],"exclude_terms":["kapsler","pods"]},{"canonical_id":"oats-rolled","display_name":"Havregryn","category":"pantry","compare_basis":"kr/kg","default_cadence_days":30,"match_terms":["havregryn"],"exclude_terms":[]},{"canonical_id":"pasta","display_name":"Pasta","category":"pantry","compare_basis":"kr/kg","default_cadence_days":30,"match_terms":["pasta","spaghetti","penne"],"exclude_terms":[]},{"canonical_id":"rice","display_name":"Ris","category":"pantry","compare_basis":"kr/kg","default_cadence_days":30,"match_terms":["ris basmati","jasminris","ris "],"exclude_terms":["risengrød"]},{"canonical_id":"black-beans-canned","display_name":"Sorte bønner, dåse","category":"pantry","compare_basis":"kr/stk","default_cadence_days":21,"match_terms":["sorte bønner"],"exclude_terms":[]},{"canonical_id":"olive-oil","display_name":"Olivenolie","category":"pantry","compare_basis":"kr/l","default_cadence_days":30,"match_terms":["olivenolie"],"exclude_terms":[]},{"canonical_id":"ketchup","display_name":"Ketchup","category":"pantry","compare_basis":"kr/kg","default_cadence_days":30,"match_terms":["ketchup"],"exclude_terms":[]},{"canonical_id":"mayo","display_name":"Mayonnaise","category":"pantry","compare_basis":"kr/kg","default_cadence_days":30,"match_terms":["mayonnaise","let mayo"],"exclude_terms":[]},{"canonical_id":"laundry-liquid","display_name":"Flydende vaskemiddel","category":"household","compare_basis":"kr/l","default_cadence_days":30,"match_terms":["flydende vaskemiddel","vaskemiddel color","vaskemiddel hvid"],"exclude_terms":["skyllemiddel"]},{"canonical_id":"dishwasher-tabs","display_name":"Opvasketabs","category":"household","compare_basis":"kr/stk","default_cadence_days":30,"match_terms":["opvasketabs","opvasketab"],"exclude_terms":[]},{"canonical_id":"toilet-paper","display_name":"Toiletpapir","category":"household","compare_basis":"kr/stk","default_cadence_days":30,"match_terms":["toiletpapir"],"exclude_terms":[]},{"canonical_id":"paper-towel","display_name":"Køkkenrulle","category":"household","compare_basis":"kr/stk","default_cadence_days":30,"match_terms":["køkkenrulle"],"exclude_terms":[]},{"canonical_id":"trash-bags","display_name":"Skraldeposer","category":"household","compare_basis":"kr/stk","default_cadence_days":45,"match_terms":["skraldeposer","affaldsposer"],"exclude_terms":[]},{"canonical_id":"dish-soap","display_name":"Opvaskemiddel","category":"household","compare_basis":"kr/l","default_cadence_days":30,"match_terms":["opvaskemiddel"],"exclude_terms":["opvasketabs"]},{"canonical_id":"diapers","display_name":"Bleer","category":"baby","compare_basis":"kr/stk","default_cadence_days":14,"match_terms":["bleer str"],"exclude_terms":["svømmeble"]},{"canonical_id":"wet-wipes","display_name":"Vådservietter","category":"baby","compare_basis":"kr/stk","default_cadence_days":21,"match_terms":["vådservietter"],"exclude_terms":[]}]}</script>
+<script id="embedded-offers" type="application/json">{"generated_at":"2026-08-01T11:35:40Z","week":"2026-W31","dealers_failed":[],"offers":[{"offer_id":"prej-10001-netto","dealer":"netto","name_raw":"Sødmælk 1 l","canonical_id":"milk-whole","price":11.95,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"l","unit_price":11.95,"unit_price_basis":"kr/l","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10001-rema","dealer":"rema","name_raw":"Sødmælk 1 l","canonical_id":"milk-whole","price":11.48,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"l","unit_price":11.48,"unit_price_basis":"kr/l","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10001-foetex","dealer":"foetex","name_raw":"Sødmælk 1 l","canonical_id":"milk-whole","price":13.17,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"l","unit_price":13.17,"unit_price_basis":"kr/l","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10002-netto","dealer":"netto","name_raw":"Smør Saltet 200 g","canonical_id":"butter-lurpak-salted","price":18.96,"pre_price":null,"unit_count":1,"size_value":200,"size_unit":"g","unit_price":94.8,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10002-rema","dealer":"rema","name_raw":"Smør Saltet 200 g","canonical_id":"butter-lurpak-salted","price":19.56,"pre_price":null,"unit_count":1,"size_value":200,"size_unit":"g","unit_price":97.8,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10002-foetex","dealer":"foetex","name_raw":"Smør Saltet 200 g","canonical_id":"butter-lurpak-salted","price":26.45,"pre_price":null,"unit_count":1,"size_value":200,"size_unit":"g","unit_price":132.25,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10003-netto","dealer":"netto","name_raw":"Rugbrød 800 g","canonical_id":"bread-rye","price":21.32,"pre_price":null,"unit_count":1,"size_value":800,"size_unit":"g","unit_price":26.65,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10003-rema","dealer":"rema","name_raw":"Rugbrød 800 g","canonical_id":"bread-rye","price":21.6,"pre_price":null,"unit_count":1,"size_value":800,"size_unit":"g","unit_price":27.0,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10004-foetex","dealer":"foetex","name_raw":"Æg 10 stk","canonical_id":"eggs-10","price":30.38,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":30.38,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10005-netto","dealer":"netto","name_raw":"Hel Kylling ca. 1,2 kg","canonical_id":"chicken-whole","price":47.97,"pre_price":null,"unit_count":1,"size_value":1.2,"size_unit":"kg","unit_price":39.98,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-05","flags":["offer_ends:2026-08-05"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10005-rema","dealer":"rema","name_raw":"Hel Kylling ca. 1,2 kg","canonical_id":"chicken-whole","price":54.46,"pre_price":null,"unit_count":1,"size_value":1.2,"size_unit":"kg","unit_price":45.38,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10005-foetex","dealer":"foetex","name_raw":"Hel Kylling ca. 1,2 kg","canonical_id":"chicken-whole","price":54.86,"pre_price":null,"unit_count":1,"size_value":1.2,"size_unit":"kg","unit_price":45.72,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10006-netto","dealer":"netto","name_raw":"Hakket Oksekød 8-12% 500 g","canonical_id":"beef-minced-8-12","price":26.97,"pre_price":null,"unit_count":1,"size_value":500,"size_unit":"g","unit_price":53.94,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10006-rema","dealer":"rema","name_raw":"Hakket Oksekød 8-12% 500 g","canonical_id":"beef-minced-8-12","price":27.31,"pre_price":null,"unit_count":1,"size_value":500,"size_unit":"g","unit_price":54.62,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10007-netto","dealer":"netto","name_raw":"Filterkaffe 400 g","canonical_id":"coffee-filter","price":42.7,"pre_price":null,"unit_count":1,"size_value":400,"size_unit":"g","unit_price":106.75,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10007-foetex","dealer":"foetex","name_raw":"Filterkaffe 400 g","canonical_id":"coffee-filter","price":44.31,"pre_price":null,"unit_count":1,"size_value":400,"size_unit":"g","unit_price":110.78,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10008-netto","dealer":"netto","name_raw":"Havregryn 1 kg","canonical_id":"oats-rolled","price":16.96,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":16.96,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10008-rema","dealer":"rema","name_raw":"Havregryn 1 kg","canonical_id":"oats-rolled","price":16.47,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":16.47,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10008-foetex","dealer":"foetex","name_raw":"Havregryn 1 kg","canonical_id":"oats-rolled","price":18.14,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":18.14,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10009-netto","dealer":"netto","name_raw":"Spaghetti 500 g","canonical_id":"pasta","price":12.53,"pre_price":null,"unit_count":1,"size_value":500,"size_unit":"g","unit_price":25.06,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10009-rema","dealer":"rema","name_raw":"Spaghetti 500 g","canonical_id":"pasta","price":11.75,"pre_price":null,"unit_count":1,"size_value":500,"size_unit":"g","unit_price":23.5,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10009-foetex","dealer":"foetex","name_raw":"Spaghetti 500 g","canonical_id":"pasta","price":12.51,"pre_price":null,"unit_count":1,"size_value":500,"size_unit":"g","unit_price":25.02,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10010-netto","dealer":"netto","name_raw":"Jasminris 1 kg","canonical_id":"rice","price":18.2,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":18.2,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10010-rema","dealer":"rema","name_raw":"Jasminris 1 kg","canonical_id":"rice","price":18.76,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":18.76,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10011-netto","dealer":"netto","name_raw":"Yoghurt Naturel 1 kg","canonical_id":"yoghurt-natural","price":18.21,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":18.21,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10011-rema","dealer":"rema","name_raw":"Yoghurt Naturel 1 kg","canonical_id":"yoghurt-natural","price":17.42,"pre_price":null,"unit_count":1,"size_value":1000,"size_unit":"g","unit_price":17.42,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10012-netto","dealer":"netto","name_raw":"Danbo 45+ 400 g","canonical_id":"cheese-danbo","price":38.3,"pre_price":null,"unit_count":1,"size_value":400,"size_unit":"g","unit_price":95.75,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10012-rema","dealer":"rema","name_raw":"Danbo 45+ 400 g","canonical_id":"cheese-danbo","price":33.61,"pre_price":null,"unit_count":1,"size_value":400,"size_unit":"g","unit_price":84.02,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-05","flags":["offer_ends:2026-08-05"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10012-foetex","dealer":"foetex","name_raw":"Danbo 45+ 400 g","canonical_id":"cheese-danbo","price":36.9,"pre_price":null,"unit_count":1,"size_value":400,"size_unit":"g","unit_price":92.25,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10013-netto","dealer":"netto","name_raw":"Bananer, løsvægt","canonical_id":"banana","price":14.82,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":14.82,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10013-rema","dealer":"rema","name_raw":"Bananer, løsvægt","canonical_id":"banana","price":13.91,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":13.91,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10013-foetex","dealer":"foetex","name_raw":"Bananer, løsvægt","canonical_id":"banana","price":14.1,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":14.1,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10014-netto","dealer":"netto","name_raw":"Æbler, Rød/Grøn","canonical_id":"apple","price":18.03,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":18.03,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10014-rema","dealer":"rema","name_raw":"Æbler, Rød/Grøn","canonical_id":"apple","price":18.89,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":18.89,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10014-foetex","dealer":"foetex","name_raw":"Æbler, Rød/Grøn","canonical_id":"apple","price":18.92,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":18.92,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10015-netto","dealer":"netto","name_raw":"Tomater i klase","canonical_id":"tomato","price":21.67,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":21.67,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10015-foetex","dealer":"foetex","name_raw":"Tomater i klase","canonical_id":"tomato","price":26.02,"pre_price":null,"unit_count":1,"size_value":1,"size_unit":"kg","unit_price":26.02,"unit_price_basis":"kr/kg","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10016-rema","dealer":"rema","name_raw":"Flydende Vaskemiddel Color 1,5 l","canonical_id":"laundry-liquid","price":34.08,"pre_price":null,"unit_count":1,"size_value":1.5,"size_unit":"l","unit_price":22.72,"unit_price_basis":"kr/l","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10016-foetex","dealer":"foetex","name_raw":"Flydende Vaskemiddel Color 1,5 l","canonical_id":"laundry-liquid","price":61.64,"pre_price":null,"unit_count":1,"size_value":1.5,"size_unit":"l","unit_price":41.09,"unit_price_basis":"kr/l","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10017-netto","dealer":"netto","name_raw":"Toiletpapir 12 ruller","canonical_id":"toilet-paper","price":37.78,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":37.78,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10017-foetex","dealer":"foetex","name_raw":"Toiletpapir 12 ruller","canonical_id":"toilet-paper","price":39.58,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":39.58,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":"2026-08-03","flags":["offer_ends:2026-08-03"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10018-netto","dealer":"netto","name_raw":"Opvasketabs All in One 40 stk","canonical_id":"dishwasher-tabs","price":68.71,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":68.71,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"},{"offer_id":"prej-10018-rema","dealer":"rema","name_raw":"Opvasketabs All in One 40 stk","canonical_id":"dishwasher-tabs","price":59.54,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":59.54,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":"2026-08-07","flags":["offer_ends:2026-08-07"],"image":null,"source":"flyer","last_seen_date":"2026-08-01"},{"offer_id":"prej-10018-foetex","dealer":"foetex","name_raw":"Opvasketabs All in One 40 stk","canonical_id":"dishwasher-tabs","price":70.78,"pre_price":null,"unit_count":1,"size_value":null,"size_unit":null,"unit_price":70.78,"unit_price_basis":"kr/stk","valid_from":null,"valid_to":null,"flags":[],"image":null,"source":"scraped","last_seen_date":"2026-08-01"}]}</script>
+<script id="embedded-history" type="application/json">{"milk-whole":[{"date":"2026-06-06","dealer":"netto","price":11.77,"unit_price":11.77},{"date":"2026-06-13","dealer":"foetex","price":12.97,"unit_price":12.97},{"date":"2026-06-13","dealer":"netto","price":7.58,"unit_price":7.58},{"date":"2026-06-20","dealer":"netto","price":11.18,"unit_price":11.18},{"date":"2026-06-27","dealer":"foetex","price":11.98,"unit_price":11.98},{"date":"2026-07-04","dealer":"netto","price":11.6,"unit_price":11.6},{"date":"2026-07-04","dealer":"rema","price":11.85,"unit_price":11.85},{"date":"2026-07-04","dealer":"foetex","price":12.41,"unit_price":12.41},{"date":"2026-07-11","dealer":"netto","price":11.85,"unit_price":11.85},{"date":"2026-07-11","dealer":"foetex","price":12.49,"unit_price":12.49},{"date":"2026-07-18","dealer":"foetex","price":12.38,"unit_price":12.38},{"date":"2026-07-25","dealer":"netto","price":12.1,"unit_price":12.1},{"date":"2026-07-25","dealer":"rema","price":6.97,"unit_price":6.97},{"date":"2026-07-25","dealer":"foetex","price":11.47,"unit_price":11.47},{"date":"2026-08-01","dealer":"netto","price":11.95,"unit_price":11.95},{"date":"2026-08-01","dealer":"rema","price":11.48,"unit_price":11.48},{"date":"2026-08-01","dealer":"foetex","price":13.17,"unit_price":13.17}],"butter-lurpak-salted":[{"date":"2026-06-06","dealer":"netto","price":23.57,"unit_price":117.85},{"date":"2026-06-06","dealer":"rema","price":24.26,"unit_price":121.3},{"date":"2026-06-13","dealer":"foetex","price":26.74,"unit_price":133.7},{"date":"2026-06-13","dealer":"rema","price":16.55,"unit_price":82.75},{"date":"2026-06-20","dealer":"netto","price":25.68,"unit_price":128.4},{"date":"2026-06-20","dealer":"rema","price":24.53,"unit_price":122.65},{"date":"2026-06-27","dealer":"netto","price":25.41,"unit_price":127.05},{"date":"2026-06-27","dealer":"foetex","price":25.76,"unit_price":128.8},{"date":"2026-07-04","dealer":"netto","price":25.57,"unit_price":127.85},{"date":"2026-07-04","dealer":"rema","price":24.11,"unit_price":120.55},{"date":"2026-07-11","dealer":"foetex","price":26.33,"unit_price":131.65},{"date":"2026-07-11","dealer":"rema","price":24.25,"unit_price":121.25},{"date":"2026-07-18","dealer":"foetex","price":14.8,"unit_price":74.0},{"date":"2026-07-18","dealer":"rema","price":16.52,"unit_price":82.6},{"date":"2026-07-25","dealer":"foetex","price":27.23,"unit_price":136.15},{"date":"2026-07-25","dealer":"netto","price":25.66,"unit_price":128.3},{"date":"2026-07-25","dealer":"rema","price":23.73,"unit_price":118.65},{"date":"2026-08-01","dealer":"netto","price":18.96,"unit_price":94.8},{"date":"2026-08-01","dealer":"rema","price":19.56,"unit_price":97.8},{"date":"2026-08-01","dealer":"foetex","price":26.45,"unit_price":132.25}],"bread-rye":[{"date":"2026-06-06","dealer":"foetex","price":24.69,"unit_price":30.86},{"date":"2026-06-13","dealer":"netto","price":22.89,"unit_price":28.61},{"date":"2026-06-13","dealer":"rema","price":23.0,"unit_price":28.75},{"date":"2026-06-20","dealer":"foetex","price":23.75,"unit_price":29.69},{"date":"2026-06-20","dealer":"netto","price":23.42,"unit_price":29.28},{"date":"2026-06-27","dealer":"netto","price":23.0,"unit_price":28.75},{"date":"2026-06-27","dealer":"rema","price":22.53,"unit_price":28.16},{"date":"2026-07-04","dealer":"foetex","price":23.63,"unit_price":29.54},{"date":"2026-07-11","dealer":"rema","price":16.32,"unit_price":20.4},{"date":"2026-07-11","dealer":"netto","price":22.38,"unit_price":27.97},{"date":"2026-07-18","dealer":"netto","price":23.57,"unit_price":29.46},{"date":"2026-07-18","dealer":"foetex","price":22.79,"unit_price":28.49},{"date":"2026-07-18","dealer":"rema","price":23.12,"unit_price":28.9},{"date":"2026-07-25","dealer":"foetex","price":24.58,"unit_price":30.72},{"date":"2026-07-25","dealer":"rema","price":23.03,"unit_price":28.79},{"date":"2026-08-01","dealer":"netto","price":21.32,"unit_price":26.65},{"date":"2026-08-01","dealer":"rema","price":21.6,"unit_price":27.0}],"eggs-10":[{"date":"2026-06-06","dealer":"netto","price":18.26,"unit_price":18.26},{"date":"2026-06-06","dealer":"foetex","price":35.11,"unit_price":35.11},{"date":"2026-06-06","dealer":"rema","price":22.33,"unit_price":22.33},{"date":"2026-06-13","dealer":"netto","price":18.33,"unit_price":18.33},{"date":"2026-06-20","dealer":"netto","price":30.77,"unit_price":30.77},{"date":"2026-06-20","dealer":"foetex","price":35.4,"unit_price":35.4},{"date":"2026-06-27","dealer":"netto","price":29.88,"unit_price":29.88},{"date":"2026-06-27","dealer":"rema","price":32.14,"unit_price":32.14},{"date":"2026-06-27","dealer":"foetex","price":35.41,"unit_price":35.41},{"date":"2026-07-04","dealer":"netto","price":32.63,"unit_price":32.63},{"date":"2026-07-11","dealer":"netto","price":30.89,"unit_price":30.89},{"date":"2026-07-18","dealer":"rema","price":29.63,"unit_price":29.63},{"date":"2026-07-18","dealer":"netto","price":32.84,"unit_price":32.84},{"date":"2026-07-25","dealer":"netto","price":33.03,"unit_price":33.03},{"date":"2026-08-01","dealer":"foetex","price":30.38,"unit_price":30.38}],"chicken-whole":[{"date":"2026-06-06","dealer":"netto","price":56.1,"unit_price":46.75},{"date":"2026-06-13","dealer":"rema","price":55.03,"unit_price":45.86},{"date":"2026-06-13","dealer":"foetex","price":57.07,"unit_price":47.56},{"date":"2026-06-20","dealer":"rema","price":51.42,"unit_price":42.85},{"date":"2026-06-27","dealer":"rema","price":49.58,"unit_price":41.32},{"date":"2026-06-27","dealer":"foetex","price":58.52,"unit_price":48.77},{"date":"2026-06-27","dealer":"netto","price":55.77,"unit_price":46.48},{"date":"2026-07-04","dealer":"netto","price":54.96,"unit_price":45.8},{"date":"2026-07-11","dealer":"netto","price":53.53,"unit_price":44.61},{"date":"2026-07-11","dealer":"foetex","price":42.08,"unit_price":35.07},{"date":"2026-07-18","dealer":"netto","price":54.68,"unit_price":45.57},{"date":"2026-07-18","dealer":"foetex","price":58.33,"unit_price":48.61},{"date":"2026-07-18","dealer":"rema","price":52.9,"unit_price":44.08},{"date":"2026-07-25","dealer":"netto","price":55.52,"unit_price":46.27},{"date":"2026-07-25","dealer":"rema","price":49.66,"unit_price":41.38},{"date":"2026-08-01","dealer":"netto","price":47.97,"unit_price":39.98},{"date":"2026-08-01","dealer":"rema","price":54.46,"unit_price":45.38},{"date":"2026-08-01","dealer":"foetex","price":54.86,"unit_price":45.72}],"beef-minced-8-12":[{"date":"2026-06-06","dealer":"netto","price":46.29,"unit_price":92.58},{"date":"2026-06-13","dealer":"netto","price":44.97,"unit_price":89.94},{"date":"2026-06-20","dealer":"rema","price":43.71,"unit_price":87.42},{"date":"2026-06-20","dealer":"netto","price":43.08,"unit_price":86.16},{"date":"2026-06-27","dealer":"foetex","price":47.8,"unit_price":95.6},{"date":"2026-06-27","dealer":"netto","price":43.88,"unit_price":87.76},{"date":"2026-07-04","dealer":"rema","price":44.69,"unit_price":89.38},{"date":"2026-07-04","dealer":"netto","price":41.34,"unit_price":82.68},{"date":"2026-07-11","dealer":"foetex","price":45.0,"unit_price":90.0},{"date":"2026-07-11","dealer":"rema","price":41.15,"unit_price":82.3},{"date":"2026-07-18","dealer":"netto","price":45.84,"unit_price":91.68},{"date":"2026-07-25","dealer":"netto","price":43.95,"unit_price":87.9},{"date":"2026-08-01","dealer":"netto","price":26.97,"unit_price":53.94},{"date":"2026-08-01","dealer":"rema","price":27.31,"unit_price":54.62}],"coffee-filter":[{"date":"2026-06-06","dealer":"netto","price":44.75,"unit_price":111.88},{"date":"2026-06-06","dealer":"rema","price":24.89,"unit_price":62.23},{"date":"2026-06-13","dealer":"foetex","price":47.88,"unit_price":119.7},{"date":"2026-06-13","dealer":"netto","price":25.87,"unit_price":64.67},{"date":"2026-06-20","dealer":"rema","price":43.28,"unit_price":108.2},{"date":"2026-06-20","dealer":"netto","price":40.78,"unit_price":101.95},{"date":"2026-06-27","dealer":"foetex","price":49.01,"unit_price":122.52},{"date":"2026-06-27","dealer":"netto","price":45.98,"unit_price":114.95},{"date":"2026-06-27","dealer":"rema","price":30.72,"unit_price":76.8},{"date":"2026-07-04","dealer":"rema","price":42.07,"unit_price":105.17},{"date":"2026-07-04","dealer":"netto","price":32.56,"unit_price":81.4},{"date":"2026-07-11","dealer":"netto","price":45.81,"unit_price":114.53},{"date":"2026-07-11","dealer":"foetex","price":46.85,"unit_price":117.12},{"date":"2026-07-11","dealer":"rema","price":43.78,"unit_price":109.45},{"date":"2026-07-18","dealer":"netto","price":44.98,"unit_price":112.45},{"date":"2026-07-18","dealer":"rema","price":44.96,"unit_price":112.4},{"date":"2026-07-25","dealer":"netto","price":44.31,"unit_price":110.78},{"date":"2026-07-25","dealer":"foetex","price":49.03,"unit_price":122.58},{"date":"2026-08-01","dealer":"netto","price":42.7,"unit_price":106.75},{"date":"2026-08-01","dealer":"foetex","price":44.31,"unit_price":110.78}],"oats-rolled":[{"date":"2026-06-06","dealer":"netto","price":16.79,"unit_price":16.79},{"date":"2026-06-13","dealer":"rema","price":16.69,"unit_price":16.69},{"date":"2026-06-13","dealer":"netto","price":16.1,"unit_price":16.1},{"date":"2026-06-20","dealer":"foetex","price":18.01,"unit_price":18.01},{"date":"2026-06-27","dealer":"rema","price":11.34,"unit_price":11.34},{"date":"2026-06-27","dealer":"foetex","price":17.77,"unit_price":17.77},{"date":"2026-07-04","dealer":"foetex","price":17.97,"unit_price":17.97},{"date":"2026-07-11","dealer":"rema","price":16.3,"unit_price":16.3},{"date":"2026-07-11","dealer":"foetex","price":17.84,"unit_price":17.84},{"date":"2026-07-11","dealer":"netto","price":16.62,"unit_price":16.62},{"date":"2026-07-18","dealer":"rema","price":16.32,"unit_price":16.32},{"date":"2026-07-18","dealer":"netto","price":17.06,"unit_price":17.06},{"date":"2026-07-25","dealer":"rema","price":16.33,"unit_price":16.33},{"date":"2026-07-25","dealer":"foetex","price":18.4,"unit_price":18.4},{"date":"2026-08-01","dealer":"netto","price":16.96,"unit_price":16.96},{"date":"2026-08-01","dealer":"rema","price":16.47,"unit_price":16.47},{"date":"2026-08-01","dealer":"foetex","price":18.14,"unit_price":18.14}],"pasta":[{"date":"2026-06-06","dealer":"foetex","price":12.99,"unit_price":25.98},{"date":"2026-06-06","dealer":"netto","price":12.63,"unit_price":25.26},{"date":"2026-06-13","dealer":"foetex","price":12.55,"unit_price":25.1},{"date":"2026-06-13","dealer":"rema","price":7.6,"unit_price":15.2},{"date":"2026-06-20","dealer":"foetex","price":13.83,"unit_price":27.66},{"date":"2026-06-20","dealer":"netto","price":12.29,"unit_price":24.58},{"date":"2026-06-20","dealer":"rema","price":12.5,"unit_price":25.0},{"date":"2026-06-27","dealer":"netto","price":12.73,"unit_price":25.46},{"date":"2026-07-04","dealer":"netto","price":13.18,"unit_price":26.36},{"date":"2026-07-04","dealer":"foetex","price":14.13,"unit_price":28.26},{"date":"2026-07-04","dealer":"rema","price":13.03,"unit_price":26.06},{"date":"2026-07-11","dealer":"foetex","price":13.93,"unit_price":27.86},{"date":"2026-07-11","dealer":"rema","price":12.51,"unit_price":25.02},{"date":"2026-07-11","dealer":"netto","price":12.23,"unit_price":24.46},{"date":"2026-07-18","dealer":"foetex","price":13.9,"unit_price":27.8},{"date":"2026-07-18","dealer":"netto","price":11.96,"unit_price":23.92},{"date":"2026-07-18","dealer":"rema","price":12.37,"unit_price":24.74},{"date":"2026-07-25","dealer":"netto","price":13.11,"unit_price":26.22},{"date":"2026-07-25","dealer":"rema","price":8.01,"unit_price":16.02},{"date":"2026-08-01","dealer":"netto","price":12.53,"unit_price":25.06},{"date":"2026-08-01","dealer":"rema","price":11.75,"unit_price":23.5},{"date":"2026-08-01","dealer":"foetex","price":12.51,"unit_price":25.02}],"rice":[{"date":"2026-06-06","dealer":"rema","price":19.42,"unit_price":19.42},{"date":"2026-06-06","dealer":"netto","price":20.48,"unit_price":20.48},{"date":"2026-06-06","dealer":"foetex","price":15.36,"unit_price":15.36},{"date":"2026-06-13","dealer":"rema","price":18.13,"unit_price":18.13},{"date":"2026-06-13","dealer":"netto","price":20.35,"unit_price":20.35},{"date":"2026-06-13","dealer":"foetex","price":21.44,"unit_price":21.44},{"date":"2026-06-20","dealer":"rema","price":18.26,"unit_price":18.26},{"date":"2026-06-20","dealer":"netto","price":20.15,"unit_price":20.15},{"date":"2026-06-27","dealer":"foetex","price":21.76,"unit_price":21.76},{"date":"2026-06-27","dealer":"netto","price":20.44,"unit_price":20.44},{"date":"2026-06-27","dealer":"rema","price":19.74,"unit_price":19.74},{"date":"2026-07-04","dealer":"foetex","price":21.61,"unit_price":21.61},{"date":"2026-07-11","dealer":"netto","price":19.6,"unit_price":19.6},{"date":"2026-07-11","dealer":"rema","price":19.86,"unit_price":19.86},{"date":"2026-07-18","dealer":"rema","price":19.52,"unit_price":19.52},{"date":"2026-07-18","dealer":"foetex","price":20.58,"unit_price":20.58},{"date":"2026-07-18","dealer":"netto","price":19.62,"unit_price":19.62},{"date":"2026-07-25","dealer":"foetex","price":11.76,"unit_price":11.76},{"date":"2026-08-01","dealer":"netto","price":18.2,"unit_price":18.2},{"date":"2026-08-01","dealer":"rema","price":18.76,"unit_price":18.76}],"yoghurt-natural":[{"date":"2026-06-06","dealer":"netto","price":17.67,"unit_price":17.67},{"date":"2026-06-06","dealer":"foetex","price":18.59,"unit_price":18.59},{"date":"2026-06-13","dealer":"rema","price":17.24,"unit_price":17.24},{"date":"2026-06-13","dealer":"foetex","price":19.31,"unit_price":19.31},{"date":"2026-06-20","dealer":"netto","price":17.53,"unit_price":17.53},{"date":"2026-06-27","dealer":"rema","price":18.02,"unit_price":18.02},{"date":"2026-07-04","dealer":"rema","price":17.94,"unit_price":17.94},{"date":"2026-07-04","dealer":"netto","price":17.03,"unit_price":17.03},{"date":"2026-07-04","dealer":"foetex","price":19.24,"unit_price":19.24},{"date":"2026-07-11","dealer":"foetex","price":18.85,"unit_price":18.85},{"date":"2026-07-18","dealer":"foetex","price":18.85,"unit_price":18.85},{"date":"2026-07-18","dealer":"rema","price":17.93,"unit_price":17.93},{"date":"2026-07-18","dealer":"netto","price":13.32,"unit_price":13.32},{"date":"2026-07-25","dealer":"foetex","price":17.82,"unit_price":17.82},{"date":"2026-07-25","dealer":"netto","price":18.07,"unit_price":18.07},{"date":"2026-07-25","dealer":"rema","price":17.88,"unit_price":17.88},{"date":"2026-08-01","dealer":"netto","price":18.21,"unit_price":18.21},{"date":"2026-08-01","dealer":"rema","price":17.42,"unit_price":17.42}],"cheese-danbo":[{"date":"2026-06-06","dealer":"rema","price":39.93,"unit_price":99.82},{"date":"2026-06-06","dealer":"foetex","price":30.76,"unit_price":76.9},{"date":"2026-06-06","dealer":"netto","price":37.25,"unit_price":93.12},{"date":"2026-06-13","dealer":"rema","price":38.4,"unit_price":96.0},{"date":"2026-06-13","dealer":"netto","price":38.19,"unit_price":95.47},{"date":"2026-06-13","dealer":"foetex","price":43.31,"unit_price":108.28},{"date":"2026-06-20","dealer":"foetex","price":41.56,"unit_price":103.9},{"date":"2026-06-20","dealer":"netto","price":37.09,"unit_price":92.73},{"date":"2026-06-27","dealer":"foetex","price":42.32,"unit_price":105.8},{"date":"2026-06-27","dealer":"rema","price":38.2,"unit_price":95.5},{"date":"2026-07-04","dealer":"rema","price":39.34,"unit_price":98.35},{"date":"2026-07-04","dealer":"netto","price":40.02,"unit_price":100.05},{"date":"2026-07-11","dealer":"foetex","price":41.76,"unit_price":104.4},{"date":"2026-07-11","dealer":"rema","price":35.57,"unit_price":88.92},{"date":"2026-07-11","dealer":"netto","price":36.29,"unit_price":90.72},{"date":"2026-07-18","dealer":"netto","price":39.41,"unit_price":98.52},{"date":"2026-07-18","dealer":"foetex","price":43.01,"unit_price":107.52},{"date":"2026-07-25","dealer":"netto","price":36.96,"unit_price":92.4},{"date":"2026-07-25","dealer":"foetex","price":42.88,"unit_price":107.2},{"date":"2026-08-01","dealer":"netto","price":38.3,"unit_price":95.75},{"date":"2026-08-01","dealer":"rema","price":33.61,"unit_price":84.02},{"date":"2026-08-01","dealer":"foetex","price":36.9,"unit_price":92.25}],"banana":[{"date":"2026-06-06","dealer":"rema","price":14.7,"unit_price":14.7},{"date":"2026-06-06","dealer":"netto","price":14.61,"unit_price":14.61},{"date":"2026-06-13","dealer":"netto","price":14.9,"unit_price":14.9},{"date":"2026-06-13","dealer":"foetex","price":14.32,"unit_price":14.32},{"date":"2026-06-13","dealer":"rema","price":14.63,"unit_price":14.63},{"date":"2026-06-20","dealer":"rema","price":14.72,"unit_price":14.72},{"date":"2026-06-27","dealer":"netto","price":9.91,"unit_price":9.91},{"date":"2026-07-04","dealer":"netto","price":10.51,"unit_price":10.51},{"date":"2026-07-04","dealer":"foetex","price":16.12,"unit_price":16.12},{"date":"2026-07-11","dealer":"foetex","price":15.79,"unit_price":15.79},{"date":"2026-07-11","dealer":"rema","price":15.08,"unit_price":15.08},{"date":"2026-07-18","dealer":"foetex","price":16.08,"unit_price":16.08},{"date":"2026-07-18","dealer":"netto","price":14.69,"unit_price":14.69},{"date":"2026-07-25","dealer":"rema","price":13.36,"unit_price":13.36},{"date":"2026-07-25","dealer":"netto","price":8.23,"unit_price":8.23},{"date":"2026-08-01","dealer":"netto","price":14.82,"unit_price":14.82},{"date":"2026-08-01","dealer":"rema","price":13.91,"unit_price":13.91},{"date":"2026-08-01","dealer":"foetex","price":14.1,"unit_price":14.1}],"apple":[{"date":"2026-06-06","dealer":"foetex","price":12.21,"unit_price":12.21},{"date":"2026-06-06","dealer":"rema","price":17.83,"unit_price":17.83},{"date":"2026-06-06","dealer":"netto","price":11.31,"unit_price":11.31},{"date":"2026-06-13","dealer":"foetex","price":20.14,"unit_price":20.14},{"date":"2026-06-13","dealer":"netto","price":19.41,"unit_price":19.41},{"date":"2026-06-20","dealer":"netto","price":17.46,"unit_price":17.46},{"date":"2026-06-20","dealer":"foetex","price":20.17,"unit_price":20.17},{"date":"2026-06-27","dealer":"rema","price":18.35,"unit_price":18.35},{"date":"2026-06-27","dealer":"netto","price":18.69,"unit_price":18.69},{"date":"2026-07-04","dealer":"rema","price":18.83,"unit_price":18.83},{"date":"2026-07-04","dealer":"netto","price":18.41,"unit_price":18.41},{"date":"2026-07-04","dealer":"foetex","price":19.03,"unit_price":19.03},{"date":"2026-07-11","dealer":"foetex","price":20.18,"unit_price":20.18},{"date":"2026-07-18","dealer":"rema","price":18.22,"unit_price":18.22},{"date":"2026-07-18","dealer":"foetex","price":20.25,"unit_price":20.25},{"date":"2026-07-25","dealer":"netto","price":18.75,"unit_price":18.75},{"date":"2026-07-25","dealer":"rema","price":10.81,"unit_price":10.81},{"date":"2026-07-25","dealer":"foetex","price":20.08,"unit_price":20.08},{"date":"2026-08-01","dealer":"netto","price":18.03,"unit_price":18.03},{"date":"2026-08-01","dealer":"rema","price":18.89,"unit_price":18.89},{"date":"2026-08-01","dealer":"foetex","price":18.92,"unit_price":18.92}],"tomato":[{"date":"2026-06-06","dealer":"foetex","price":15.88,"unit_price":15.88},{"date":"2026-06-06","dealer":"netto","price":17.58,"unit_price":17.58},{"date":"2026-06-06","dealer":"rema","price":24.93,"unit_price":24.93},{"date":"2026-06-13","dealer":"foetex","price":26.39,"unit_price":26.39},{"date":"2026-06-20","dealer":"netto","price":25.13,"unit_price":25.13},{"date":"2026-06-27","dealer":"foetex","price":24.82,"unit_price":24.82},{"date":"2026-06-27","dealer":"rema","price":24.36,"unit_price":24.36},{"date":"2026-06-27","dealer":"netto","price":24.38,"unit_price":24.38},{"date":"2026-07-04","dealer":"foetex","price":25.68,"unit_price":25.68},{"date":"2026-07-04","dealer":"netto","price":24.54,"unit_price":24.54},{"date":"2026-07-11","dealer":"rema","price":24.67,"unit_price":24.67},{"date":"2026-07-18","dealer":"rema","price":24.12,"unit_price":24.12},{"date":"2026-07-18","dealer":"foetex","price":27.21,"unit_price":27.21},{"date":"2026-07-25","dealer":"rema","price":25.07,"unit_price":25.07},{"date":"2026-07-25","dealer":"netto","price":25.52,"unit_price":25.52},{"date":"2026-08-01","dealer":"netto","price":21.67,"unit_price":21.67},{"date":"2026-08-01","dealer":"foetex","price":26.02,"unit_price":26.02}],"laundry-liquid":[{"date":"2026-06-06","dealer":"rema","price":60.0,"unit_price":40.0},{"date":"2026-06-13","dealer":"foetex","price":62.72,"unit_price":41.81},{"date":"2026-06-13","dealer":"rema","price":55.29,"unit_price":36.86},{"date":"2026-06-20","dealer":"netto","price":60.14,"unit_price":40.09},{"date":"2026-06-20","dealer":"rema","price":58.59,"unit_price":39.06},{"date":"2026-06-20","dealer":"foetex","price":62.36,"unit_price":41.57},{"date":"2026-06-27","dealer":"foetex","price":60.64,"unit_price":40.43},{"date":"2026-06-27","dealer":"rema","price":41.06,"unit_price":27.37},{"date":"2026-07-04","dealer":"rema","price":57.43,"unit_price":38.29},{"date":"2026-07-04","dealer":"netto","price":59.35,"unit_price":39.57},{"date":"2026-07-04","dealer":"foetex","price":45.69,"unit_price":30.46},{"date":"2026-07-11","dealer":"foetex","price":61.7,"unit_price":41.13},{"date":"2026-07-18","dealer":"rema","price":41.5,"unit_price":27.67},{"date":"2026-07-18","dealer":"netto","price":56.57,"unit_price":37.71},{"date":"2026-07-25","dealer":"foetex","price":64.92,"unit_price":43.28},{"date":"2026-07-25","dealer":"netto","price":59.29,"unit_price":39.53},{"date":"2026-07-25","dealer":"rema","price":59.67,"unit_price":39.78},{"date":"2026-08-01","dealer":"rema","price":34.08,"unit_price":22.72},{"date":"2026-08-01","dealer":"foetex","price":61.64,"unit_price":41.09}],"toilet-paper":[{"date":"2026-06-06","dealer":"foetex","price":30.79,"unit_price":30.79},{"date":"2026-06-13","dealer":"netto","price":41.92,"unit_price":41.92},{"date":"2026-06-13","dealer":"foetex","price":46.54,"unit_price":46.54},{"date":"2026-06-20","dealer":"netto","price":30.46,"unit_price":30.46},{"date":"2026-06-20","dealer":"rema","price":38.99,"unit_price":38.99},{"date":"2026-06-20","dealer":"foetex","price":29.88,"unit_price":29.88},{"date":"2026-06-27","dealer":"netto","price":31.1,"unit_price":31.1},{"date":"2026-06-27","dealer":"foetex","price":44.82,"unit_price":44.82},{"date":"2026-07-04","dealer":"netto","price":42.85,"unit_price":42.85},{"date":"2026-07-04","dealer":"rema","price":43.1,"unit_price":43.1},{"date":"2026-07-11","dealer":"rema","price":41.7,"unit_price":41.7},{"date":"2026-07-11","dealer":"netto","price":43.31,"unit_price":43.31},{"date":"2026-07-11","dealer":"foetex","price":44.84,"unit_price":44.84},{"date":"2026-07-18","dealer":"netto","price":41.94,"unit_price":41.94},{"date":"2026-07-18","dealer":"rema","price":41.73,"unit_price":41.73},{"date":"2026-07-25","dealer":"foetex","price":32.6,"unit_price":32.6},{"date":"2026-07-25","dealer":"rema","price":40.85,"unit_price":40.85},{"date":"2026-08-01","dealer":"netto","price":37.78,"unit_price":37.78},{"date":"2026-08-01","dealer":"foetex","price":39.58,"unit_price":39.58}],"dishwasher-tabs":[{"date":"2026-06-06","dealer":"foetex","price":75.63,"unit_price":75.63},{"date":"2026-06-13","dealer":"netto","price":63.89,"unit_price":63.89},{"date":"2026-06-13","dealer":"rema","price":65.32,"unit_price":65.32},{"date":"2026-06-20","dealer":"foetex","price":74.8,"unit_price":74.8},{"date":"2026-06-20","dealer":"netto","price":69.7,"unit_price":69.7},{"date":"2026-06-27","dealer":"foetex","price":45.16,"unit_price":45.16},{"date":"2026-06-27","dealer":"netto","price":68.59,"unit_price":68.59},{"date":"2026-07-04","dealer":"foetex","price":75.99,"unit_price":75.99},{"date":"2026-07-04","dealer":"rema","price":67.55,"unit_price":67.55},{"date":"2026-07-11","dealer":"rema","price":66.8,"unit_price":66.8},{"date":"2026-07-11","dealer":"foetex","price":72.93,"unit_price":72.93},{"date":"2026-07-11","dealer":"netto","price":70.68,"unit_price":70.68},{"date":"2026-07-18","dealer":"foetex","price":71.98,"unit_price":71.98},{"date":"2026-07-18","dealer":"rema","price":68.37,"unit_price":68.37},{"date":"2026-07-18","dealer":"netto","price":70.67,"unit_price":70.67},{"date":"2026-07-25","dealer":"foetex","price":74.02,"unit_price":74.02},{"date":"2026-07-25","dealer":"rema","price":70.37,"unit_price":70.37},{"date":"2026-07-25","dealer":"netto","price":70.41,"unit_price":70.41},{"date":"2026-08-01","dealer":"netto","price":68.71,"unit_price":68.71},{"date":"2026-08-01","dealer":"rema","price":59.54,"unit_price":59.54},{"date":"2026-08-01","dealer":"foetex","price":70.78,"unit_price":70.78}]}</script>
+<script id="embedded-unmatched" type="application/json">{"generated_at":"2026-08-01T11:35:40Z","candidates":[]}</script>
+
+<script>
+'use strict';
+
+/* =========================================================================
+   CONFIG
+   ========================================================================= */
+const DEALERS = [
+  { key:'netto',  name:'Netto',       color:'#FFE600', text:'#14171A' },
+  { key:'rema',   name:'Rema 1000',   color:'#E30613', text:'#FFFFFF' },
+  { key:'foetex', name:'føtex',       color:'#00274D', text:'#FFFFFF' },
+];
+const DEALER_BY_KEY = Object.fromEntries(DEALERS.map(d=>[d.key,d]));
+function andetDealer(){ return { key:'andet', name:t('andetDealerName'), color:'#3A4048', text:'#ECEEF0' }; }
+function dealerDisplay(key){ return DEALER_BY_KEY[key] || andetDealer(); }
+
+const QUALITY_RANK  = { excellent:3, good:2, normal:1, weak:0, unknown:-1 };
+
+const STORAGE_KEY = 'tt_state_v1';
+const CONSOLIDATE_BELOW_KR = 60;
+const CONSOLIDATE_EXTRA_MAX_KR = 15;
+
+/* =========================================================================
+   I18N — UI chrome only. Product names (catalog display_name, raw offer
+   headings) stay Danish always, since that's the literal text printed in
+   the flyers and needed to find the item in-store.
+   ========================================================================= */
+const STRINGS = {
+  en: {
+    pageTitle: "TilbudTracker — This week's best prices",
+    headerTitle: "This week's best prices",
+    weekLabel: "Week {num}, {year}",
+    missingDealers: "⚠ missing: {list}",
+    tabWeek: "This Week", tabBasket: "Basket", tabProducts: "My Products", tabHistory: "History",
+    demoBanner: "Showing demo data (couldn't fetch data/*.json). Deploy to GitHub Pages and run the pipeline for your own prices — see README.",
+    demoDismiss: "Hide",
+    exportBtn: "Export my data", importBtn: "Import",
+    footerNote: "Prices come from Prej (prej.dk) and may differ in-store. TilbudTracker is a personal tool and isn't affiliated with Netto, Rema 1000, føtex, Salling Group, or Prej.",
+    fabLabel: "Ran out?",
+    loadingWeek: "Loading this week's offers…",
+    emptyWeekNoFavorites: "You're not tracking any products yet.",
+    chooseProductsBtn: "Choose your products",
+    budgetLabel: "Weekly budget (optional)", budgetPlaceholder: "e.g. 900",
+    overBudgetMsg: "Your recurring staples cost {cost} — {over} over budget. Consider deferring the priciest ones below.",
+    underBudgetMsg: "Recurring staples: {cost}. {remaining} left{extras}.",
+    extrasSuffix: " — suggesting {n} extra deals below",
+    thisWeeksOffers: "This week's offers ({n})",
+    noOffersThisWeek: "None of your products are on offer right now.",
+    missingFromCatalogs: "No price found at your tracked chains — buy where you usually do",
+    inBasketBtn: "✓ In basket", addToBasketBtn: "+ Add to basket",
+    boughtBtn: "Bought ✓", snoozeBtn: "Snooze 1 week",
+    budgetSuggestionNote: "💡 Suggested extra — fits your budget",
+    missingTag: "No price yet",
+    notInCatalogsInBasket: "No current price at Netto, Rema 1000 or føtex — in the basket anyway.",
+    notInCatalogsNotBasket: "No current price at Netto, Rema 1000 or føtex — buy at your usual store.",
+    savingsSuffix: " · saves {amount}",
+    lastBoughtSuffix: " · last bought {n} days ago",
+    firstTimeSuffix: " · first time",
+    basketTitle: "Shopping basket, by chain",
+    consolidationSuggestion: "💡 Skip {dealer} this week for only +{extra} — get everything else from the other chains instead.",
+    andetNote: "No current offer price — buy at normal price, or move it to a chain.",
+    moveTo: "move to…",
+    itemCount: "Items", totalSavings: "Total savings", totalKnown: "Total (known prices)",
+    markWeekDoneBtn: "Mark this week's shopping as done",
+    emptyBasket: "Your basket is empty. Items that are due this week are added automatically — or tap Ran out? below to add something right now.",
+    myProductsTitle: "My products ({n})",
+    everyNDays: "every {n} days", perTrip: "{n} per trip",
+    editBtn: "Edit", removeBtn: "Remove",
+    noProductsYet: "No products chosen yet.",
+    addMoreProductsBtn: "+ Add more products",
+    recognizedNotFollowed: "Recognized, but not tracked yet",
+    looksLike: 'looks like "{name}"',
+    addCustomTitle: "Add your own product",
+    nameLabel: "Name", namePlaceholder: "e.g. Chili Sauce",
+    categoryLabel: "Category", unitLabel: "Unit",
+    searchTermsLabel: "Search terms (comma-separated, as they appear in the flyers)",
+    searchTermsPlaceholder: "e.g. chili sauce, hot sauce",
+    addAndFollowBtn: "Add and track",
+    weeklySpendTitle: "Weekly spend by chain",
+    noPurchasesYet: "No purchases recorded yet.",
+    totalSaved: "Total saved",
+    recentPurchases: "Recent purchases ({n})",
+    deleteBtn: "Delete", priceUnknown: "price unknown",
+    onboardingTitle1: "What do you usually buy?",
+    onboardingSub1: "Tap what your household buys. You can always add more later.",
+    skipBtn: "Skip", continueBtn: "Continue ({n} selected)",
+    onboardingTitle2: "How often do you buy it?",
+    onboardingSub2: "This is just a starting point — it tunes itself over time.",
+    backBtn: "Back", saveAndStartBtn: "Save and start",
+    quickAddTitle: "Ran out of something?",
+    quickAddSub: "Added to the basket right away — whether it's on offer this week or not.",
+    quickAddPlaceholder: "Search e.g. milk, diapers, candles…",
+    closeBtn: "Close",
+    alreadyInBasket: "Already in basket",
+    trackedNotDue: "Tracked, not due right now",
+    newItemNote: "New item — will be added to My Products",
+    addBtn: "+ Add",
+    notInCatalogAdhoc: "Not in the product list — add as a one-off",
+    oneOffBtn: "+ One-off",
+    startTypingNote: "Start typing to search or add…",
+    importAlertError: "Couldn't read the file — is it a valid export?",
+    srcTagRecurring: "Recurring", srcTagAddedNow: "Added now",
+    srcTagOneOff: "One-off", srcTagFirstTime: "First time",
+    pcsUnit: "pcs", pcsPerTrip: "pcs per trip",
+    quality_excellent: "Best price", quality_good: "Good price", quality_normal: "Normal price",
+    quality_weak: "Rarely this cheap", quality_unknown: "Unknown",
+    andetDealerName: "Other / no live offer",
+    cat_dairy: "Dairy", cat_meat: "Meat/fish", cat_fish: "Meat/fish", cat_bakery: "Bakery",
+    cat_produce: "Produce", cat_pantry: "Pantry", cat_household: "Household",
+    cat_baby: "Baby", cat_other: "Other",
+    cadence_weekly: "Weekly", cadence_biweekly: "Every 2 weeks", cadence_monthly: "Monthly",
+  },
+  da: {
+    pageTitle: "TilbudTracker — Ugens bedste priser",
+    headerTitle: "Ugens bedste priser",
+    weekLabel: "Uge {num}, {year}",
+    missingDealers: "⚠ mangler: {list}",
+    tabWeek: "Ugen", tabBasket: "Kurv", tabProducts: "Varer", tabHistory: "Historik",
+    demoBanner: "Viser demo-data (kunne ikke hente data/*.json). Læg appen på GitHub Pages og kør pipelinen for dine egne priser — se README.",
+    demoDismiss: "Skjul",
+    exportBtn: "Eksporter mine data", importBtn: "Importer",
+    footerNote: "Priser kommer fra Prej (prej.dk) og kan afvige fra butikken. TilbudTracker er et privat værktøj og ikke tilknyttet Netto, Rema 1000, føtex, Salling Group eller Prej.",
+    fabLabel: "Løbet tør?",
+    loadingWeek: "Henter ugens tilbud…",
+    emptyWeekNoFavorites: "Du følger ingen varer endnu.",
+    chooseProductsBtn: "Vælg dine varer",
+    budgetLabel: "Ugentligt budget (valgfrit)", budgetPlaceholder: "fx 900",
+    overBudgetMsg: "Dine faste varer koster {cost} — {over} over budget. Overvej at udskyde de dyreste nedenfor.",
+    underBudgetMsg: "Faste varer: {cost}. {remaining} tilbage{extras}.",
+    extrasSuffix: " — foreslår {n} ekstra tilbud nedenfor",
+    thisWeeksOffers: "Denne uges tilbud ({n})",
+    noOffersThisWeek: "Ingen af dine varer er på tilbud lige nu.",
+    missingFromCatalogs: "Ingen pris fundet hos dine kæder — køb hvor I plejer",
+    inBasketBtn: "✓ I kurven", addToBasketBtn: "+ Læg i kurv",
+    boughtBtn: "Købt ✓", snoozeBtn: "Udskyd 1 uge",
+    budgetSuggestionNote: "💡 Foreslået ekstra inden for budget",
+    missingTag: "Ingen pris endnu",
+    notInCatalogsInBasket: "Ingen aktuel pris hos Netto, Rema 1000 eller føtex — ligger i kurven alligevel.",
+    notInCatalogsNotBasket: "Ingen aktuel pris hos Netto, Rema 1000 eller føtex — køb hvor I plejer.",
+    savingsSuffix: " · sparer {amount}",
+    lastBoughtSuffix: " · sidst købt for {n} dage siden",
+    firstTimeSuffix: " · første gang",
+    basketTitle: "Indkøbskurv, fordelt pr. kæde",
+    consolidationSuggestion: "💡 Spring {dealer} over denne uge for kun +{extra} — saml alt hos de andre kæder i stedet.",
+    andetNote: "Ingen aktuel tilbudspris — køb til normalpris, eller flyt til en kæde.",
+    moveTo: "flyt til…",
+    itemCount: "Antal varer", totalSavings: "Samlet besparelse", totalKnown: "I alt (kendte priser)",
+    markWeekDoneBtn: "Marker ugens indkøb som købt",
+    emptyBasket: "Kurven er tom. Varer, der er \"due\" denne uge, lægges automatisk i kurven — eller tryk Løbet tør? nederst for at tilføje noget lige nu.",
+    myProductsTitle: "Mine varer ({n})",
+    everyNDays: "hver {n}. dag", perTrip: "{n} stk pr. indkøb",
+    editBtn: "Rediger", removeBtn: "Fjern",
+    noProductsYet: "Ingen varer valgt endnu.",
+    addMoreProductsBtn: "+ Tilføj flere varer",
+    recognizedNotFollowed: "Genkendte, men ikke fulgt endnu",
+    looksLike: 'ligner "{name}"',
+    addCustomTitle: "Tilføj eget produkt",
+    nameLabel: "Navn", namePlaceholder: "fx Ají Chileno",
+    categoryLabel: "Kategori", unitLabel: "Enhed",
+    searchTermsLabel: "Søgeord (kommasepareret, som de står i tilbudsaviser)",
+    searchTermsPlaceholder: "fx ají, chili sauce",
+    addAndFollowBtn: "Tilføj og følg",
+    weeklySpendTitle: "Ugentligt forbrug pr. kæde",
+    noPurchasesYet: "Ingen køb registreret endnu.",
+    totalSaved: "Sparet i alt",
+    recentPurchases: "Seneste køb ({n})",
+    deleteBtn: "Slet", priceUnknown: "pris ukendt",
+    onboardingTitle1: "Hvad køber I typisk?",
+    onboardingSub1: "Tryk på det I plejer at købe. Du kan altid tilføje flere senere.",
+    skipBtn: "Spring over", continueBtn: "Videre ({n} valgt)",
+    onboardingTitle2: "Hvor tit køber I det?",
+    onboardingSub2: "Vi lærer bedre efterhånden — dette er bare et udgangspunkt.",
+    backBtn: "Tilbage", saveAndStartBtn: "Gem og start",
+    quickAddTitle: "Løbet tør for noget?",
+    quickAddSub: "Lægges i kurven med det samme — uanset om det er på tilbud denne uge eller ej.",
+    quickAddPlaceholder: "Søg fx mælk, bleer, stearinlys…",
+    closeBtn: "Luk",
+    alreadyInBasket: "Allerede i kurv",
+    trackedNotDue: "Følges, ikke aktuel lige nu",
+    newItemNote: "Ny vare — bliver tilføjet til Mine varer",
+    addBtn: "+ Tilføj",
+    notInCatalogAdhoc: "Ikke i vareoversigten — tilføj som engangsvare",
+    oneOffBtn: "+ Engang",
+    startTypingNote: "Begynd at skrive for at søge eller tilføje…",
+    importAlertError: "Kunne ikke læse filen — er det en gyldig eksport?",
+    srcTagRecurring: "Fast vare", srcTagAddedNow: "Tilføjet nu",
+    srcTagOneOff: "Engangsvare", srcTagFirstTime: "Første gang",
+    pcsUnit: "stk", pcsPerTrip: "stk pr. indkøb",
+    quality_excellent: "Top pris", quality_good: "God pris", quality_normal: "Normal pris",
+    quality_weak: "Sjældent godt", quality_unknown: "Ukendt",
+    andetDealerName: "Andet / intet tilbud",
+    cat_dairy: "Mejeri", cat_meat: "Kød/fisk", cat_fish: "Kød/fisk", cat_bakery: "Bageri",
+    cat_produce: "Frugt/grønt", cat_pantry: "Kolonial", cat_household: "Husholdning",
+    cat_baby: "Baby", cat_other: "Andet",
+    cadence_weekly: "Ugentlig", cadence_biweekly: "Hver 2. uge", cadence_monthly: "Månedligt",
+  },
+};
+function t(key, params){
+  const lang = (STATE && STATE.language) || 'en';
+  let s = (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
+  if(params){ for(const k in params) s = s.split('{'+k+'}').join(params[k]); }
+  return s;
+}
+function qualityLabel(label){ return t('quality_'+label); }
+function cadencePresets(){
+  return [
+    { label: t('cadence_weekly'), days:7 },
+    { label: t('cadence_biweekly'), days:14 },
+    { label: t('cadence_monthly'), days:30 },
+  ];
+}
+
+/* =========================================================================
+   EMBEDDED FALLBACK DATA (used only if data/*.json can't be fetched, e.g.
+   when previewing this file standalone rather than deploying it)
+   ========================================================================= */
+function readEmbedded(id){
+  try { return JSON.parse(document.getElementById(id).textContent); }
+  catch(e){ return null; }
+}
+const EMBEDDED = {
+  catalog: readEmbedded('embedded-catalog'),
+  offers: readEmbedded('embedded-offers'),
+  history: readEmbedded('embedded-history'),
+  unmatched: readEmbedded('embedded-unmatched'),
+};
+
+let CATALOG_BASE = { products: [] };
+let OFFERS = { week:'', dealers_failed:[], offers:[] };
+let HISTORY = {};
+let UNMATCHED = { candidates: [] };
+let usingFallback = false;
+
+async function loadData(){
+  async function tryFetch(path){
+    const res = await fetch(path, { cache:'no-store' });
+    if(!res.ok) throw new Error('http '+res.status);
+    return await res.json();
+  }
+  try{
+    const [c,o,h,u] = await Promise.all([
+      tryFetch('data/catalog.json'),
+      tryFetch('data/offers.json'),
+      tryFetch('data/price_history.json'),
+      tryFetch('data/unmatched_candidates.json'),
+    ]);
+    CATALOG_BASE = c; OFFERS = o; HISTORY = h; UNMATCHED = u;
+    usingFallback = false;
+  }catch(e){
+    CATALOG_BASE = EMBEDDED.catalog || { products: [] };
+    OFFERS = EMBEDDED.offers || { week:'', dealers_failed:[], offers:[] };
+    HISTORY = EMBEDDED.history || {};
+    UNMATCHED = EMBEDDED.unmatched || { candidates: [] };
+    usingFallback = true;
+  }
+}
+
+/* =========================================================================
+   STATE (persisted to localStorage)
+   ========================================================================= */
+function defaultState(){
+  return {
+    version:1,
+    budgetWeeklyDkk: null,
+    favorites: {},        // cid -> { cadenceDays, typicalQty, addedAt }
+    purchases: [],         // { id, cid, date, dealer, price, prePrice, qty, name? }
+    customProducts: {},    // cid -> { displayName, category, compareBasis, matchTerms:[], excludeTerms:[] }
+    adHocItems: {},         // id -> { name, dealer, price, qty, note, addedAt } — one-off, not in the catalog at all
+    basketOverrides: {},   // cid -> dealerKey
+    basketQty: {},         // cid -> qty
+    excludedThisWeek: [],
+    pinned: [],             // manually-added "buy this now" items — bypasses the weekly offer cycle entirely
+    dismissedCandidates: [],
+    onboarded: false,
+    demoDismissed: false,
+    lastSeenWeek: null,
+    language: 'en',
+  };
+}
+let STATE = loadState();
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){ return defaultState(); }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+}
+function resetWeekIfNeeded(){
+  if(OFFERS.week && STATE.lastSeenWeek !== OFFERS.week){
+    STATE.excludedThisWeek = [];
+    STATE.pinned = [];
+    STATE.lastSeenWeek = OFFERS.week;
+    saveState();
+  }
+}
+
+/* =========================================================================
+   UTILITIES
+   ========================================================================= */
+function fmtKr(n){
+  if(n===null || n===undefined || isNaN(n)) return '–';
+  return n.toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' kr';
+}
+function fmtKrShort(n){
+  if(n===null||n===undefined||isNaN(n)) return '–';
+  return Math.round(n).toLocaleString('da-DK') + ' kr';
+}
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(iso1, iso2){
+  const a = new Date(iso1+'T00:00:00Z'), b = new Date(iso2+'T00:00:00Z');
+  return Math.round((b-a)/86400000);
+}
+function uid(){ return 'x'+Math.random().toString(36).slice(2,10); }
+function isoWeekOf(iso){
+  const d = new Date(iso+'T00:00:00Z');
+  const target = new Date(d.valueOf());
+  const dayNr = (d.getUTCDay()+6)%7;
+  target.setUTCDate(target.getUTCDate()-dayNr+3);
+  const firstThursday = new Date(Date.UTC(target.getUTCFullYear(),0,4));
+  const week = 1 + Math.round(((target-firstThursday)/86400000 - 3 + ((firstThursday.getUTCDay()+6)%7))/7);
+  return `${target.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+function clamp(n,lo,hi){ return Math.max(lo,Math.min(hi,n)); }
+function escapeHtml(s){
+  return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* =========================================================================
+   CATALOG (shared dictionary + user's own custom products)
+   ========================================================================= */
+function mergedCatalog(){
+  const custom = Object.entries(STATE.customProducts).map(([cid,p])=>({
+    canonical_id: cid, display_name:p.displayName, category:p.category||'other',
+    compare_basis:p.compareBasis||'kr/stk', default_cadence_days:p.cadenceDays||14,
+    match_terms:p.matchTerms||[], exclude_terms:p.excludeTerms||[], custom:true,
+  }));
+  return [...(CATALOG_BASE.products||[]), ...custom];
+}
+let PRODUCT_INDEX = {};
+function rebuildProductIndex(){
+  PRODUCT_INDEX = {};
+  for(const p of mergedCatalog()) PRODUCT_INDEX[p.canonical_id] = p;
+}
+function getProduct(cid){ return PRODUCT_INDEX[cid]; }
+
+/* Client-side matching pass: only for offers the server pipeline left
+   unmatched (canonical_id===null), tested against the user's own custom
+   products. This lets someone track a personal product the shared
+   catalog.json doesn't know about without waiting for a repo update. */
+const DIACRITIC_MAP = {'æ':'ae','ø':'oe','å':'aa'};
+function normalizeNameJS(raw){
+  if(!raw) return '';
+  let s = raw.toLowerCase().replace(/[æøå]/g, c=>DIACRITIC_MAP[c]);
+  s = s.replace(/[^a-z0-9æøå%\s]/gi,' ').replace(/\s+/g,' ').trim();
+  return s;
+}
+let LIVE_OFFERS = [];
+function buildLiveOffers(){
+  LIVE_OFFERS = (OFFERS.offers||[]).map(o=>({...o}));
+  const customs = Object.entries(STATE.customProducts);
+  if(!customs.length) return;
+  for(const o of LIVE_OFFERS){
+    if(o.canonical_id) continue;
+    const norm = normalizeNameJS(o.name_raw);
+    for(const [cid,p] of customs){
+      const terms = (p.matchTerms||[]).map(normalizeNameJS).filter(Boolean);
+      const excludes = (p.excludeTerms||[]).map(normalizeNameJS).filter(Boolean);
+      if(excludes.some(ex=>norm.includes(ex))) continue;
+      if(terms.some(t=>norm.includes(t))){ o.canonical_id = cid; break; }
+    }
+  }
+}
+
+/* =========================================================================
+   DEAL QUALITY, DUE STATUS, DIGEST
+   ========================================================================= */
+function dealQuality(cid, unitPrice, hasActiveOfferEnd){
+  const points = (HISTORY[cid]||[]).map(p=>p.unit_price).filter(x=>x!=null && !isNaN(x));
+  if(points.length>=6 && unitPrice!=null){
+    const sorted=[...points].sort((a,b)=>a-b);
+    const percentile = sorted.filter(p=>p<=unitPrice).length/sorted.length;
+    let label='normal';
+    if(percentile<=0.10) label='excellent';
+    else if(percentile<=0.35) label='good';
+    else if(percentile<=0.65) label='normal';
+    else label='weak';
+    return {label, percentile};
+  }
+  // Cold start (not enough history yet): Prej doesn't supply a "was" price
+  // to fall back on (a good thing — retailer-supplied "was" prices can be
+  // inflated), so the only signal available this early is whether the
+  // price carries an offer end date at all.
+  if(hasActiveOfferEnd) return {label:'good', percentile:null};
+  return {label:'unknown', percentile:null};
+}
+function historicalMedianPrice(cid){
+  const points = (HISTORY[cid]||[]).map(p=>p.price).filter(x=>x!=null && !isNaN(x));
+  if(points.length<4) return null;
+  const sorted=[...points].sort((a,b)=>a-b);
+  return sorted[Math.floor(sorted.length/2)];
+}
+function effectiveCadence(cid){
+  const fav = STATE.favorites[cid];
+  const base = fav ? fav.cadenceDays : 14;
+  const purchases = STATE.purchases.filter(p=>p.cid===cid).sort((a,b)=>a.date<b.date?1:-1).slice(0,6);
+  if(purchases.length<2) return base;
+  const dates=purchases.map(p=>p.date).sort();
+  const intervals=[];
+  for(let i=1;i<dates.length;i++) intervals.push(daysBetween(dates[i-1],dates[i]));
+  intervals.sort((a,b)=>a-b);
+  const median = intervals[Math.floor(intervals.length/2)];
+  return clamp(median,4,60);
+}
+function dueInfo(cid){
+  const fav = STATE.favorites[cid];
+  if(!fav) return null;
+  const cadence = effectiveCadence(cid);
+  const purchases = STATE.purchases.filter(p=>p.cid===cid).sort((a,b)=>a.date<b.date?1:-1);
+  if(!purchases.length) return {due:true, daysSince:null, cadence, lastDate:null};
+  const lastDate = purchases[0].date;
+  const daysSince = daysBetween(lastDate, todayISO());
+  return {due: daysSince >= 0.8*cadence, daysSince, cadence, lastDate};
+}
+function offersForCid(cid){
+  return LIVE_OFFERS.filter(o=>o.canonical_id===cid && !STATE.excludedThisWeek.includes(cid))
+    .sort((a,b)=>(a.unit_price??a.price)-(b.unit_price??b.price));
+}
+function buildDigest(){
+  rebuildProductIndex();
+  buildLiveOffers();
+  const items=[];
+  for(const cid of Object.keys(STATE.favorites)){
+    const product = getProduct(cid);
+    if(!product) continue;
+    const offers = offersForCid(cid);
+    const due = dueInfo(cid);
+    let best=null, alternatives=[], quality={label:'unknown'}, savings=null;
+    if(offers.length){
+      best = offers[0];
+      alternatives = offers.slice(1);
+      const hasOfferEnd = (best.flags||[]).some(f=>f.startsWith('offer_ends:'));
+      quality = dealQuality(cid, best.unit_price, hasOfferEnd);
+      const median = historicalMedianPrice(cid);
+      if(median!=null && median > best.price) savings = median - best.price;
+    }
+    items.push({cid, product, due, best, alternatives, quality, savings});
+  }
+  items.sort((a,b)=>{
+    if((a.due?.due?1:0) !== (b.due?.due?1:0)) return (b.due?.due?1:0)-(a.due?.due?1:0);
+    const qd = QUALITY_RANK[b.quality.label]-QUALITY_RANK[a.quality.label];
+    if(qd) return qd;
+    return (b.savings||0)-(a.savings||0);
+  });
+  return items;
+}
+
+/* =========================================================================
+   BASKET
+   ========================================================================= */
+function inBasket(item){
+  if(STATE.excludedThisWeek.includes(item.cid)) return false;
+  if(STATE.pinned.includes(item.cid)) return true;
+  return !!(item.due && item.due.due);
+}
+function basketLineFor(item){
+  const dealerKey = STATE.basketOverrides[item.cid] || (item.best ? item.best.dealer : null) || 'andet';
+  const offer = item.best && item.best.dealer===dealerKey ? item.best
+    : (item.alternatives.find(o=>o.dealer===dealerKey) || item.best || null);
+  const qty = STATE.basketQty[item.cid] || (getProduct(item.cid)?.typical_qty) || 1;
+  return { dealerKey, offer, qty };
+}
+function basketLineSourceTag(item){
+  if(STATE.pinned.includes(item.cid)) return t('srcTagAddedNow');
+  if(item.due && item.due.due) return item.due.lastDate ? t('srcTagRecurring') : t('srcTagFirstTime');
+  return '';
+}
+function buildBasket(digest){
+  const basketItems = digest.filter(inBasket);
+  const byDealer = {};
+  let grandTotal=0, totalSavings=0;
+  for(const item of basketItems){
+    const {dealerKey, offer, qty} = basketLineFor(item);
+    const price = offer ? offer.price : null;
+    const prePrice = offer ? offer.pre_price : null;
+    const lineTotal = price!=null ? price*qty : 0;
+    grandTotal += lineTotal;
+    if(prePrice!=null && price!=null && prePrice>price) totalSavings += (prePrice-price)*qty;
+    (byDealer[dealerKey] = byDealer[dealerKey]||[]).push({
+      kind:'catalog', item, offer, qty, lineTotal, priceKnown: price!=null, sourceTag: basketLineSourceTag(item),
+    });
+  }
+  for(const [id, ah] of Object.entries(STATE.adHocItems)){
+    const dealerKey = ah.dealer || 'andet';
+    const price = ah.price!=null ? Number(ah.price) : null;
+    const qty = ah.qty || 1;
+    const lineTotal = price!=null ? price*qty : 0;
+    grandTotal += lineTotal;
+    (byDealer[dealerKey] = byDealer[dealerKey]||[]).push({
+      kind:'adhoc', adHocId:id, adHoc:ah, qty, lineTotal, priceKnown: price!=null, sourceTag:t('srcTagOneOff'),
+    });
+  }
+  const subtotals = Object.fromEntries(Object.entries(byDealer).map(([k,lines])=>[k, lines.reduce((s,l)=>s+l.lineTotal,0)]));
+  return {basketItems, byDealer, subtotals, grandTotal, totalSavings};
+}
+function consolidationSuggestion(basket){
+  const dealerKeys = Object.keys(basket.subtotals).filter(k=>k!=='andet');
+  for(const dk of dealerKeys){
+    const sub = basket.subtotals[dk];
+    if(sub<=0 || sub>=CONSOLIDATE_BELOW_KR) continue;
+    const lines = basket.byDealer[dk].filter(l=>l.kind==='catalog');
+    if(!lines.length) continue;
+    let extra=0, feasible=true;
+    for(const line of lines){
+      const alt = [line.item.best, ...line.item.alternatives].find(o=>o && o.dealer!==dk && dealerKeys.includes(o.dealer));
+      if(!alt){ feasible=false; break; }
+      extra += (alt.price-line.offer.price)*line.qty;
+    }
+    if(feasible && extra <= CONSOLIDATE_EXTRA_MAX_KR){
+      return { fromDealer:dk, extraKr: Math.max(0,extra), subtotal:sub };
+    }
+  }
+  return null;
+}
+
+/* =========================================================================
+   BUDGET PRIORITIZER
+   ========================================================================= */
+function applyBudget(digest, budget){
+  const withOffer = digest.filter(i=>i.best);
+  const needs = withOffer.filter(i=>i.due && i.due.due);
+  const wants = withOffer.filter(i=>!(i.due && i.due.due) && ['excellent','good'].includes(i.quality.label));
+  const qty = i => STATE.basketQty[i.cid] || (getProduct(i.cid)?.typical_qty) || 1;
+  const needsCost = needs.reduce((s,i)=>s+i.best.price*qty(i),0);
+  if(budget==null) return {needs, wants:[], needsCost, overBudget:false, remaining:null, suggestedExtras:[]};
+  if(needsCost>budget){
+    const over = [...needs].sort((a,b)=>b.best.price-a.best.price);
+    return {needs:over, wants:[], needsCost, overBudget:true, remaining:budget-needsCost, suggestedExtras:[]};
+  }
+  let remaining = budget-needsCost;
+  const ranked = [...wants].sort((a,b)=>{
+    const pa = QUALITY_RANK[a.quality.label]*((a.savings||1)/Math.max(a.best.price,1));
+    const pb = QUALITY_RANK[b.quality.label]*((b.savings||1)/Math.max(b.best.price,1));
+    return pb-pa;
+  });
+  const suggestedExtras=[];
+  for(const item of ranked){
+    const cost = item.best.price*qty(item);
+    if(cost<=remaining){ suggestedExtras.push(item); remaining-=cost; }
+  }
+  return {needs, wants, needsCost, overBudget:false, remaining, suggestedExtras};
+}
+
+/* =========================================================================
+   PURCHASE LOGGING
+   ========================================================================= */
+function logPurchase(cid, dealer, price, prePrice, qty){
+  STATE.purchases.push({id:uid(), cid, date:todayISO(), dealer, price, prePrice:prePrice||null, qty:qty||1});
+  saveState();
+}
+function markWeekDone(basket){
+  for(const [dealerKey, lines] of Object.entries(basket.byDealer)){
+    for(const line of lines){
+      if(line.kind==='adhoc'){
+        STATE.purchases.push({id:uid(), cid:null, name:line.adHoc.name, date:todayISO(), dealer:dealerKey, price:line.adHoc.price, prePrice:null, qty:line.qty});
+        delete STATE.adHocItems[line.adHocId];
+      } else {
+        logPurchase(line.item.cid, dealerKey, line.offer?line.offer.price:null, line.offer?line.offer.pre_price:null, line.qty);
+        delete STATE.basketOverrides[line.item.cid];
+        delete STATE.basketQty[line.item.cid];
+        STATE.pinned = STATE.pinned.filter(c=>c!==line.item.cid);
+      }
+    }
+  }
+  saveState();
+}
+
+/* =========================================================================
+   SPARKLINE / CHARTS (hand-rolled SVG, no chart library dependency)
+   ========================================================================= */
+function sparklineSVG(cid){
+  const points = (HISTORY[cid]||[]).slice().sort((a,b)=>a.date<b.date?-1:1).slice(-14).map(p=>p.unit_price).filter(x=>x!=null);
+  if(points.length<2) return '';
+  const w=110,h=28,pad=3;
+  const min=Math.min(...points), max=Math.max(...points);
+  const span = (max-min)||1;
+  const stepX = (w-2*pad)/(points.length-1);
+  const coords = points.map((v,i)=>{
+    const x = pad+i*stepX;
+    const y = h-pad-((v-min)/span)*(h-2*pad);
+    return [x,y];
+  });
+  const path = coords.map((c,i)=>(i===0?'M':'L')+c[0].toFixed(1)+','+c[1].toFixed(1)).join(' ');
+  const last = coords[coords.length-1];
+  return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <path d="${path}" fill="none" stroke="#4AFF8C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.2" fill="#4AFF8C"/>
+  </svg>`;
+}
+function weeklySpendChart(){
+  const byWeekDealer = {};
+  for(const p of STATE.purchases){
+    if(p.price==null) continue;
+    const wk = isoWeekOf(p.date);
+    byWeekDealer[wk] = byWeekDealer[wk] || {};
+    byWeekDealer[wk][p.dealer] = (byWeekDealer[wk][p.dealer]||0) + p.price*(p.qty||1);
+  }
+  const weeks = Object.keys(byWeekDealer).sort().slice(-8);
+  if(!weeks.length) return `<div class="empty-state">${t('noPurchasesYet')}</div>`;
+  const maxTotal = Math.max(...weeks.map(wk=>Object.values(byWeekDealer[wk]).reduce((s,v)=>s+v,0)), 1);
+  const w=560,h=140,barW=Math.min(48,(w/weeks.length)-10);
+  let bars='';
+  weeks.forEach((wk,i)=>{
+    const x = 10 + i*(w-20)/weeks.length;
+    let yOff=h-20;
+    for(const dk of Object.keys(byWeekDealer[wk])){
+      const val = byWeekDealer[wk][dk]||0;
+      if(!val) continue;
+      const d = dealerDisplay(dk);
+      const barH = (val/maxTotal)*(h-40);
+      yOff -= barH;
+      bars += `<rect x="${x}" y="${yOff}" width="${barW}" height="${barH}" fill="${d.color}" rx="2"/>`;
+    }
+    bars += `<text x="${x+barW/2}" y="${h-6}" font-size="9" fill="#8A9099" text-anchor="middle" font-family="IBM Plex Mono,monospace">${wk.slice(6)}</text>`;
+  });
+  return `<svg class="bar-chart" viewBox="0 0 ${w} ${h}">${bars}</svg>`;
+}
+
+/* =========================================================================
+   RENDERING
+   ========================================================================= */
+let ACTIVE_TAB = 'week';
+const ICONS = {
+  week:  '<path d="M4 4h16v17H4z"/><path d="M4 9h16M8 2v4M16 2v4"/>',
+  basket:'<path d="M5 8h14l-1.5 11a2 2 0 0 1-2 1.8H8.5a2 2 0 0 1-2-1.8L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  products:'<path d="M4 4h16v6H4zM4 14h16v6H4z"/><path d="M8 7h.01M8 17h.01"/>',
+  history:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l4 2"/>',
+};
+function tabIcon(name){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const digest = buildDigest();
+  try{ document.title = t('pageTitle'); }catch(e){}
+  try{ if(document.documentElement) document.documentElement.lang = STATE.language; }catch(e){}
+  app.innerHTML = `
+    ${renderHeader()}
+    ${renderBanners()}
+    <main id="tab-content">${renderTab(ACTIVE_TAB, digest)}</main>
+    <div class="footer-actions" style="max-width:640px;margin:26px auto 10px;">
+      <button class="btn ghost block" data-action="export-data">${t('exportBtn')}</button>
+      <button class="btn ghost block" data-action="import-data">${t('importBtn')}</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+    <div class="footer-note">${t('footerNote')}</div>
+    ${STATE.onboarded ? `<button class="fab" data-action="open-quickadd">${tabIcon('basket')}<span>${t('fabLabel')}</span></button>` : ''}
+    ${renderTabbar()}
+    ${!STATE.onboarded ? renderOnboardingModal() : (QUICKADD_OPEN ? renderQuickAddModal() : '')}
+  `;
+  bindPerRenderInputs();
+}
+
+function renderHeader(){
+  const failed = OFFERS.dealers_failed||[];
+  const weekText = OFFERS.week ? t('weekLabel', {num: OFFERS.week.split('W')[1], year: OFFERS.week.split('-')[0]}) : '';
+  return `
+  <header class="app-header">
+    <div class="lang-toggle">
+      <button data-action="set-language" data-lang="en" class="${STATE.language==='en'?'on':''}">EN</button>
+      <button data-action="set-language" data-lang="da" class="${STATE.language==='da'?'on':''}">DA</button>
+    </div>
+    <div class="wordmark">TilbudTracker</div>
+    <h1>${t('headerTitle')}</h1>
+    <div class="meta">
+      <span>${weekText}</span>
+      ${failed.length ? `<span style="color:var(--alert)">${t('missingDealers', {list: failed.join(', ')})}</span>` : ''}
+    </div>
+    <div class="dealer-strip">
+      ${DEALERS.map(d=>`<span class="dealer-chip" style="background:${d.color};color:${d.text}">${d.name}</span>`).join('')}
+    </div>
+  </header>`;
+}
+
+function renderBanners(){
+  let html='';
+  if(usingFallback && !STATE.demoDismissed){
+    html += `<div class="banner demo">
+      <span>📎 ${t('demoBanner')}</span>
+      <button class="dismiss" data-action="dismiss-demo">${t('demoDismiss')}</button>
+    </div>`;
+  }
+  return html;
+}
+
+function renderTabbar(){
+  const tabs = [['week',t('tabWeek')],['basket',t('tabBasket')],['products',t('tabProducts')],['history',t('tabHistory')]];
+  return `<nav class="tabbar">
+    ${tabs.map(([key,label])=>`
+      <button data-action="tab" data-tab="${key}" class="${ACTIVE_TAB===key?'active':''}">
+        ${tabIcon(key)}<span>${label}</span>
+      </button>`).join('')}
+  </nav>`;
+}
+
+function renderTab(tab, digest){
+  if(tab==='week') return renderWeekTab(digest);
+  if(tab==='basket') return renderBasketTab(digest);
+  if(tab==='products') return renderProductsTab();
+  if(tab==='history') return renderHistoryTab();
+  return '';
+}
+
+/* ---- This Week tab ---- */
+function renderWeekTab(digest){
+  if(!Object.keys(STATE.favorites).length){
+    return `<div class="empty-state">${t('emptyWeekNoFavorites')}<br><button class="btn primary" data-action="open-onboarding">${t('chooseProductsBtn')}</button></div>`;
+  }
+  const withOffer = digest.filter(i=>i.best);
+  const dueNoOffer = digest.filter(i=>!i.best && i.due && i.due.due);
+  const budget = STATE.budgetWeeklyDkk;
+  const b = applyBudget(digest, budget);
+
+  let html = `
+  <div class="field" style="margin-top:14px;">
+    <label>${t('budgetLabel')}</label>
+    <input type="number" inputmode="numeric" placeholder="${t('budgetPlaceholder')}" id="budget-input" value="${budget??''}">
+  </div>`;
+
+  if(budget!=null){
+    if(b.overBudget){
+      html += `<div class="banner warn">${t('overBudgetMsg', {cost: fmtKrShort(b.needsCost), over: fmtKrShort(Math.abs(b.remaining))})}</div>`;
+    } else {
+      const extras = b.suggestedExtras.length ? t('extrasSuffix', {n: b.suggestedExtras.length}) : '';
+      html += `<div class="banner demo" style="color:var(--led); border-color:rgba(74,255,140,.35); background:rgba(74,255,140,.08);">
+        ${t('underBudgetMsg', {cost: fmtKrShort(b.needsCost), remaining: fmtKrShort(b.remaining), extras})}
+      </div>`;
+    }
+  }
+
+  html += `<div class="section-title">${t('thisWeeksOffers', {n: withOffer.length})}</div>`;
+  html += withOffer.length ? withOffer.map(i=>offerCardHtml(i, b.suggestedExtras.includes(i))).join('') : `<div class="empty-state">${t('noOffersThisWeek')}</div>`;
+
+  if(dueNoOffer.length){
+    html += `<div class="section-title">${t('missingFromCatalogs')}</div>`;
+    html += dueNoOffer.map(i=>notOnOfferCardHtml(i)).join('');
+  }
+  return html;
+}
+
+function offerCardHtml(item, isBudgetSuggestion){
+  const {product, best, alternatives, quality, due, savings, cid} = item;
+  const dealer = DEALER_BY_KEY[best.dealer];
+  const inBasketNow = inBasket(item);
+  const savingsText = savings ? t('savingsSuffix', {amount: fmtKrShort(savings)}) : '';
+  const lastBoughtText = due&&due.due&&due.lastDate ? t('lastBoughtSuffix', {n: due.daysSince}) : '';
+  const firstTimeText = due&&!due.lastDate ? t('firstTimeSuffix') : '';
+  return `
+  <div class="card" data-cid="${cid}">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${escapeHtml(product.display_name)}</div>
+        <div class="card-sub">${escapeHtml(best.name_raw)}</div>
+      </div>
+      <span class="stamp ${quality.label}">${qualityLabel(quality.label)}</span>
+    </div>
+    <div class="price-row">
+      <span class="price-big">${fmtKr(best.price)}</span>
+      ${best.pre_price && best.pre_price>best.price ? `<span class="price-pre">${fmtKr(best.pre_price)}</span>`:''}
+      <span class="dealer-chip" style="background:${dealer.color};color:${dealer.text}">${dealer.name}</span>
+    </div>
+    <div class="unit-price">${best.unit_price!=null ? fmtKr(best.unit_price)+' / '+best.unit_price_basis.split('/')[1] : ''}${savingsText}${lastBoughtText}${firstTimeText}</div>
+    ${sparklineSVG(cid)}
+    <div class="card-actions">
+      <button class="btn ${inBasketNow?'primary':'ghost'} small" data-action="toggle-basket" data-cid="${cid}">${inBasketNow?t('inBasketBtn'):t('addToBasketBtn')}</button>
+      <button class="btn ghost small" data-action="log-purchase" data-cid="${cid}" data-dealer="${best.dealer}" data-price="${best.price}" data-preprice="${best.pre_price??''}">${t('boughtBtn')}</button>
+      ${alternatives.length? `<button class="caret-btn" data-action="toggle-alts" data-cid="${cid}">▾ ${alternatives.length}</button>`:''}
+    </div>
+    ${isBudgetSuggestion? `<div class="unit-price" style="color:var(--cyan); margin-top:6px;">${t('budgetSuggestionNote')}</div>`:''}
+    <div class="alt-table" id="alts-${cid}" style="display:none;">
+      ${alternatives.map(o=>{
+        const d = DEALER_BY_KEY[o.dealer];
+        const deltaPct = best.price? Math.round(((o.price-best.price)/best.price)*100):0;
+        return `<div class="alt-row">
+          <span class="dealer-chip" style="background:${d.color};color:${d.text}">${d.name}</span>
+          <span class="mono">${fmtKr(o.price)}</span>
+          <span class="delta">+${deltaPct}%</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function notOnOfferCardHtml(item){
+  const {product, cid} = item;
+  const inBasketNow = inBasket(item);
+  return `<div class="card" data-cid="${cid}">
+    <div class="card-top">
+      <div class="card-name">${escapeHtml(product.display_name)}</div>
+      <span class="stamp due">${t('missingTag')}</span>
+    </div>
+    <div class="unit-price">${inBasketNow?t('notInCatalogsInBasket'):t('notInCatalogsNotBasket')}</div>
+    <div class="card-actions">
+      <button class="btn ${inBasketNow?'primary':'ghost'} small" data-action="toggle-basket" data-cid="${cid}">${inBasketNow?t('inBasketBtn'):t('addToBasketBtn')}</button>
+      <button class="btn ghost small" data-action="log-purchase-manual" data-cid="${cid}">${t('boughtBtn')}</button>
+      <button class="btn ghost small" data-action="snooze" data-cid="${cid}">${t('snoozeBtn')}</button>
+    </div>
+  </div>`;
+}
+
+/* ---- Basket tab ---- */
+function renderBasketTab(digest){
+  const basket = buildBasket(digest);
+  const totalCount = basket.basketItems.length + Object.keys(STATE.adHocItems).length;
+  if(!totalCount){
+    return `<div class="empty-state">${t('emptyBasket')}</div>`;
+  }
+  const suggestion = consolidationSuggestion(basket);
+  let html = `<div class="section-title">${t('basketTitle')}</div>`;
+  if(suggestion){
+    const d = dealerDisplay(suggestion.fromDealer);
+    html += `<div class="suggest-box">${t('consolidationSuggestion', {dealer: d.name, extra: fmtKrShort(suggestion.extraKr)})}</div>`;
+  }
+  const dealerOrder = [...DEALERS.map(d=>d.key).filter(k=>basket.byDealer[k]), ...(basket.byDealer['andet']?['andet']:[])];
+  for(const dealerKey of dealerOrder){
+    const d = dealerDisplay(dealerKey);
+    const lines = basket.byDealer[dealerKey];
+    html += `<div class="basket-dealer">
+      <div class="basket-dealer-head">
+        <span class="dealer-chip" style="background:${d.color};color:${d.text}">${d.name}</span>
+        <span class="mono">${fmtKr(basket.subtotals[dealerKey])}</span>
+      </div>
+      ${dealerKey==='andet' ? `<div class="andet-note">${t('andetNote')}</div>` : ''}
+      ${lines.map(line=>{
+        const otherDealers = DEALERS.filter(dd=>dd.key!==dealerKey);
+        if(line.kind==='adhoc'){
+          return `<div class="basket-line">
+            <span class="name-wrap"><span class="name">${escapeHtml(line.adHoc.name)}</span><div class="src-tag">${line.sourceTag}</div></span>
+            <span class="qty-ctl"><span>${line.qty} ${t('pcsUnit')}</span></span>
+            <select class="dealer-move" data-action="move-dealer-adhoc" data-id="${line.adHocId}">
+              <option value="">${t('moveTo')}</option>
+              ${DEALERS.map(od=>`<option value="${od.key}">${od.name}</option>`).join('')}
+            </select>
+            <span class="line-total ${line.priceKnown?'':'price-unknown'}">${line.priceKnown?fmtKrShort(line.lineTotal):'?'}</span>
+            <button class="remove-x" data-action="delete-adhoc" data-id="${line.adHocId}">✕</button>
+          </div>`;
+        }
+        return `<div class="basket-line">
+          <span class="name-wrap"><span class="name">${escapeHtml(line.item.product.display_name)}</span>${line.sourceTag?`<div class="src-tag">${line.sourceTag}</div>`:''}</span>
+          <span class="qty-ctl">
+            <button data-action="qty-dec" data-cid="${line.item.cid}">−</button>
+            <span>${line.qty}</span>
+            <button data-action="qty-inc" data-cid="${line.item.cid}">+</button>
+          </span>
+          <select class="dealer-move" data-action="move-dealer" data-cid="${line.item.cid}">
+            <option value="">${t('moveTo')}</option>
+            ${otherDealers.map(od=>`<option value="${od.key}">${od.name}</option>`).join('')}
+          </select>
+          <span class="line-total ${line.priceKnown?'':'price-unknown'}">${line.priceKnown?fmtKrShort(line.lineTotal):'?'}</span>
+          <button class="remove-x" data-action="toggle-basket" data-cid="${line.item.cid}">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  html += `<div class="totals-card">
+    <div class="totals-row"><span>${t('itemCount')}</span><span>${totalCount}</span></div>
+    <div class="totals-row"><span class="save">${t('totalSavings')}</span><span class="save mono">${fmtKr(basket.totalSavings)}</span></div>
+    <div class="totals-row grand"><span>${t('totalKnown')}</span><span>${fmtKr(basket.grandTotal)}</span></div>
+  </div>
+  <button class="btn primary block" data-action="mark-week-done">${t('markWeekDoneBtn')}</button>`;
+  return html;
+}
+
+/* ---- My Products tab ---- */
+function renderProductsTab(){
+  const favEntries = Object.entries(STATE.favorites);
+  const pendingCandidates = (UNMATCHED.candidates||[]).filter(c=>
+    !STATE.favorites[c.suggested_canonical_id] && !STATE.dismissedCandidates.includes(c.offer_id));
+
+  let html = `<div class="section-title">${t('myProductsTitle', {n: favEntries.length})}</div>`;
+  html += favEntries.length ? favEntries.map(([cid,fav])=>{
+    const product = getProduct(cid);
+    if(!product) return '';
+    return `<div class="list-item">
+      <div class="grow">
+        <div class="name">${escapeHtml(product.display_name)}</div>
+        <div class="sub">${t('everyNDays', {n: fav.cadenceDays})} · ${t('perTrip', {n: fav.typicalQty||1})}</div>
+      </div>
+      <button class="btn ghost small" data-action="edit-cadence" data-cid="${cid}">${t('editBtn')}</button>
+      <button class="btn danger small" data-action="remove-favorite" data-cid="${cid}">${t('removeBtn')}</button>
+    </div>`;
+  }).join('') : `<div class="empty-state">${t('noProductsYet')}</div>`;
+
+  html += `<div class="footer-actions" style="margin-top:14px;">
+    <button class="btn primary block" data-action="open-onboarding">${t('addMoreProductsBtn')}</button>
+  </div>`;
+
+  if(pendingCandidates.length){
+    html += `<div class="section-title">${t('recognizedNotFollowed')}</div>`;
+    html += pendingCandidates.map(c=>{
+      const p = getProduct(c.suggested_canonical_id);
+      return `<div class="list-item">
+        <div class="grow">
+          <div class="name">${escapeHtml(c.name_raw)}</div>
+          <div class="sub">${t('looksLike', {name: p?p.display_name:c.suggested_canonical_id})} · ${DEALER_BY_KEY[c.dealer]?.name} · ${fmtKrShort(c.price)}</div>
+        </div>
+        <button class="btn ghost small" data-action="accept-candidate" data-cid="${c.suggested_canonical_id}" data-offer="${c.offer_id}">✓</button>
+        <button class="btn ghost small" data-action="dismiss-candidate" data-offer="${c.offer_id}">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  html += `<div class="section-title">${t('addCustomTitle')}</div>
+  <div class="card">
+    <div class="field"><label>${t('nameLabel')}</label><input type="text" id="custom-name" placeholder="${t('namePlaceholder')}"></div>
+    <div class="row">
+      <div class="field"><label>${t('categoryLabel')}</label>
+        <select id="custom-category">
+          <option value="pantry">${t('cat_pantry')}</option><option value="produce">${t('cat_produce')}</option>
+          <option value="dairy">${t('cat_dairy')}</option><option value="meat">${t('cat_meat')}</option>
+          <option value="household">${t('cat_household')}</option><option value="other">${t('cat_other')}</option>
+        </select>
+      </div>
+      <div class="field"><label>${t('unitLabel')}</label>
+        <select id="custom-basis"><option value="kr/kg">kr/kg</option><option value="kr/l">kr/l</option><option value="kr/stk">kr/stk</option></select>
+      </div>
+    </div>
+    <div class="field"><label>${t('searchTermsLabel')}</label><input type="text" id="custom-terms" placeholder="${t('searchTermsPlaceholder')}"></div>
+    <button class="btn primary block" data-action="add-custom">${t('addAndFollowBtn')}</button>
+  </div>`;
+
+  return html;
+}
+
+/* ---- History tab ---- */
+function renderHistoryTab(){
+  const totalSaved = STATE.purchases.reduce((s,p)=> s + (p.prePrice&&p.prePrice>p.price ? (p.prePrice-p.price)*(p.qty||1) : 0), 0);
+  const recent = [...STATE.purchases].sort((a,b)=>a.date<b.date?1:-1).slice(0,25);
+  let html = `<div class="section-title">${t('weeklySpendTitle')}</div>${weeklySpendChart()}`;
+  html += `<div class="totals-card"><div class="totals-row grand"><span>${t('totalSaved')}</span><span class="save">${fmtKr(totalSaved)}</span></div></div>`;
+  html += `<div class="section-title">${t('recentPurchases', {n: STATE.purchases.length})}</div>`;
+  html += recent.length ? recent.map(p=>{
+    const product = p.cid ? getProduct(p.cid) : null;
+    const d = dealerDisplay(p.dealer);
+    const label = product ? product.display_name : (p.name || p.cid || '—');
+    const priceLabel = p.price!=null ? fmtKrShort(p.price*(p.qty||1)) : t('priceUnknown');
+    return `<div class="list-item">
+      <div class="grow">
+        <div class="name">${escapeHtml(label)}</div>
+        <div class="sub">${p.date} · ${d.name} · ${priceLabel}</div>
+      </div>
+      <button class="btn danger small" data-action="delete-purchase" data-id="${p.id}">${t('deleteBtn')}</button>
+    </div>`;
+  }).join('') : `<div class="empty-state">${t('noPurchasesYet')}</div>`;
+  return html;
+}
+
+/* ---- Onboarding modal ---- */
+let ONBOARD_STEP = 1;
+let ONBOARD_SELECTED = new Set();
+let ONBOARD_CADENCE = {};
+function renderOnboardingModal(){
+  if(ONBOARD_STEP===1){
+    const already = new Set(Object.keys(STATE.favorites));
+    const cats = {};
+    for(const p of mergedCatalog()){
+      if(already.has(p.canonical_id)) continue;
+      (cats[p.category]=cats[p.category]||[]).push(p);
+    }
+    return `<div class="modal-overlay"><div class="modal">
+      <h2>${t('onboardingTitle1')}</h2>
+      <div class="step-sub">${t('onboardingSub1')}</div>
+      ${Object.entries(cats).map(([cat,items])=>`
+        <div class="cat-group">
+          <h4>${t('cat_'+cat) !== 'cat_'+cat ? t('cat_'+cat) : cat}</h4>
+          ${items.map(p=>`<span class="chip-toggle ${ONBOARD_SELECTED.has(p.canonical_id)?'on':''}" data-action="toggle-onboard" data-cid="${p.canonical_id}">${escapeHtml(p.display_name)}</span>`).join('')}
+        </div>`).join('')}
+      <div class="footer-actions">
+        <button class="btn ghost" data-action="skip-onboarding">${t('skipBtn')}</button>
+        <button class="btn primary block" data-action="onboard-next" ${ONBOARD_SELECTED.size?'':'disabled'}>${t('continueBtn', {n: ONBOARD_SELECTED.size})}</button>
+      </div>
+    </div></div>`;
+  }
+  // step 2: cadence
+  const list = [...ONBOARD_SELECTED];
+  return `<div class="modal-overlay"><div class="modal">
+    <h2>${t('onboardingTitle2')}</h2>
+    <div class="step-sub">${t('onboardingSub2')}</div>
+    ${list.map(cid=>{
+      const p = getProduct(cid);
+      const cur = ONBOARD_CADENCE[cid] || p.default_cadence_days || 14;
+      return `<div class="list-item">
+        <div class="grow"><div class="name">${escapeHtml(p.display_name)}</div></div>
+        <div class="segmented" style="width:180px;">
+          ${cadencePresets().map(c=>`<button class="${cur===c.days?'on':''}" data-action="set-cadence" data-cid="${cid}" data-days="${c.days}">${c.label}</button>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="footer-actions">
+      <button class="btn ghost" data-action="onboard-back">${t('backBtn')}</button>
+      <button class="btn primary block" data-action="finish-onboarding">${t('saveAndStartBtn')}</button>
+    </div>
+  </div></div>`;
+}
+
+/* ---- Quick add ("we're just out of it") modal ---- */
+let QUICKADD_OPEN = false;
+let QUICKADD_QUERY = '';
+function renderQuickAddModal(){
+  return `<div class="modal-overlay">
+    <div class="modal">
+      <h2>${t('quickAddTitle')}</h2>
+      <div class="step-sub">${t('quickAddSub')}</div>
+      <div class="field"><input type="text" id="quickadd-input" placeholder="${t('quickAddPlaceholder')}" value="${escapeHtml(QUICKADD_QUERY)}" autocomplete="off"></div>
+      <div id="quickadd-results">${renderQuickAddResultsHtml(QUICKADD_QUERY)}</div>
+      <div class="footer-actions"><button class="btn ghost block" data-action="close-quickadd">${t('closeBtn')}</button></div>
+    </div>
+  </div>`;
+}
+function renderQuickAddResultsHtml(query){
+  const norm = normalizeNameJS(query);
+  const digest = buildDigest();
+  const inBasketCids = new Set(digest.filter(inBasket).map(i=>i.cid));
+  let html = '';
+  if(norm){
+    const matches = mergedCatalog().filter(p=>normalizeNameJS(p.display_name).includes(norm)).slice(0,12);
+    html += matches.map(p=>{
+      const isFav = !!STATE.favorites[p.canonical_id];
+      const already = inBasketCids.has(p.canonical_id);
+      const tag = already ? t('alreadyInBasket') : (isFav ? t('trackedNotDue') : t('newItemNote'));
+      return `<div class="list-item" data-action="quickadd-select" data-cid="${p.canonical_id}">
+        <div class="grow"><div class="name">${escapeHtml(p.display_name)}</div><div class="sub">${tag}</div></div>
+        <button class="btn primary small">${already?'✓':t('addBtn')}</button>
+      </div>`;
+    }).join('');
+  }
+  if(query.trim()){
+    html += `<div class="list-item" data-action="quickadd-adhoc" data-name="${escapeHtml(query.trim())}">
+      <div class="grow"><div class="name">"${escapeHtml(query.trim())}"</div><div class="sub">${t('notInCatalogAdhoc')}</div></div>
+      <button class="btn ghost small">${t('oneOffBtn')}</button>
+    </div>`;
+  }
+  if(!html) html = `<div class="empty-state">${t('startTypingNote')}</div>`;
+  return html;
+}
+
+/* =========================================================================
+   EVENT HANDLING (delegated)
+   ========================================================================= */
+let DELEGATED_LISTENERS_BOUND = false;
+function bindDelegatedListenersOnce(){
+  if(DELEGATED_LISTENERS_BOUND) return;
+  const app = document.getElementById('app');
+  app.addEventListener('click', onClick);
+  app.addEventListener('change', onChange);
+  DELEGATED_LISTENERS_BOUND = true;
+}
+function bindPerRenderInputs(){
+  const budgetInput = document.getElementById('budget-input');
+  if(budgetInput){
+    budgetInput.addEventListener('change', e=>{
+      const v = e.target.value.trim();
+      STATE.budgetWeeklyDkk = v? Number(v) : null;
+      saveState(); render();
+    });
+  }
+  const quickInput = document.getElementById('quickadd-input');
+  if(quickInput){
+    try{
+      quickInput.focus();
+      quickInput.selectionStart = quickInput.selectionEnd = quickInput.value.length;
+    }catch(e){ /* not all environments support focus/selection APIs */ }
+    quickInput.addEventListener('input', e=>{
+      QUICKADD_QUERY = e.target.value;
+      const results = document.getElementById('quickadd-results');
+      if(results) results.innerHTML = renderQuickAddResultsHtml(QUICKADD_QUERY);
+    });
+  }
+}
+
+function onClick(e){
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const action = el.dataset.action;
+  const cid = el.dataset.cid;
+
+  switch(action){
+    case 'tab': ACTIVE_TAB = el.dataset.tab; render(); break;
+    case 'dismiss-demo': STATE.demoDismissed = true; saveState(); render(); break;
+
+    case 'toggle-basket': {
+      if(STATE.pinned.includes(cid)){ STATE.pinned = STATE.pinned.filter(c=>c!==cid); }
+      else if(STATE.excludedThisWeek.includes(cid)){ STATE.excludedThisWeek = STATE.excludedThisWeek.filter(c=>c!==cid); STATE.pinned.push(cid); }
+      else {
+        const digest = buildDigest();
+        const item = digest.find(i=>i.cid===cid);
+        const currentlyIn = item && inBasket(item);
+        if(currentlyIn) STATE.excludedThisWeek.push(cid); else STATE.pinned.push(cid);
+      }
+      saveState(); render(); break;
+    }
+    case 'toggle-alts': {
+      const box = document.getElementById('alts-'+cid);
+      if(box) box.style.display = box.style.display==='none' ? 'block' : 'none';
+      break;
+    }
+    case 'log-purchase':
+      logPurchase(cid, el.dataset.dealer, Number(el.dataset.price), el.dataset.preprice?Number(el.dataset.preprice):null, STATE.basketQty[cid]||1);
+      render(); break;
+    case 'log-purchase-manual':
+      logPurchase(cid, 'other', null, null, 1);
+      render(); break;
+    case 'snooze': {
+      const fav = STATE.favorites[cid];
+      if(fav) logPurchase(cid, 'skipped', null, null, 0); // resets "due" clock without claiming a price
+      render(); break;
+    }
+
+    case 'qty-inc': STATE.basketQty[cid] = (STATE.basketQty[cid]|| (getProduct(cid)?.typical_qty)||1)+1; saveState(); render(); break;
+    case 'qty-dec': {
+      const cur = STATE.basketQty[cid] || (getProduct(cid)?.typical_qty) || 1;
+      STATE.basketQty[cid] = Math.max(1,cur-1); saveState(); render(); break;
+    }
+    case 'mark-week-done': {
+      const digest = buildDigest();
+      const basket = buildBasket(digest);
+      markWeekDone(basket);
+      render(); break;
+    }
+
+    case 'edit-cadence': {
+      const fav = STATE.favorites[cid];
+      const next = cadencePresets().find(c=>c.days>fav.cadenceDays) || cadencePresets()[0];
+      fav.cadenceDays = next.days; saveState(); render(); break;
+    }
+    case 'remove-favorite': delete STATE.favorites[cid]; saveState(); render(); break;
+    case 'accept-candidate':
+      STATE.favorites[cid] = STATE.favorites[cid] || {cadenceDays:(getProduct(cid)?.default_cadence_days)||14, typicalQty:1, addedAt:todayISO()};
+      saveState(); render(); break;
+    case 'dismiss-candidate': STATE.dismissedCandidates.push(el.dataset.offer); saveState(); render(); break;
+    case 'add-custom': addCustomProduct(); break;
+
+    case 'delete-purchase': STATE.purchases = STATE.purchases.filter(p=>p.id!==el.dataset.id); saveState(); render(); break;
+
+    case 'open-onboarding': ONBOARD_STEP=1; ONBOARD_SELECTED=new Set(); ONBOARD_CADENCE={}; STATE.onboarded=false; render(); break;
+    case 'skip-onboarding': STATE.onboarded=true; saveState(); render(); break;
+    case 'toggle-onboard':
+      ONBOARD_SELECTED.has(cid) ? ONBOARD_SELECTED.delete(cid) : ONBOARD_SELECTED.add(cid);
+      render(); break;
+    case 'onboard-next': ONBOARD_STEP=2; render(); break;
+    case 'onboard-back': ONBOARD_STEP=1; render(); break;
+    case 'set-cadence': ONBOARD_CADENCE[cid]=Number(el.dataset.days); render(); break;
+    case 'finish-onboarding': {
+      for(const c of ONBOARD_SELECTED){
+        const p = getProduct(c);
+        STATE.favorites[c] = { cadenceDays: ONBOARD_CADENCE[c]||p.default_cadence_days||14, typicalQty:1, addedAt: todayISO() };
+      }
+      STATE.onboarded = true; saveState(); render(); break;
+    }
+    case 'export-data': exportData(); break;
+    case 'import-data': document.getElementById('import-file').click(); break;
+
+    case 'open-quickadd': QUICKADD_OPEN=true; QUICKADD_QUERY=''; render(); break;
+    case 'close-quickadd': QUICKADD_OPEN=false; render(); break;
+    case 'quickadd-select': {
+      if(!STATE.favorites[cid]){
+        const p = getProduct(cid);
+        STATE.favorites[cid] = { cadenceDays: (p&&p.default_cadence_days)||21, typicalQty:1, addedAt: todayISO() };
+      }
+      if(!STATE.pinned.includes(cid)) STATE.pinned.push(cid);
+      STATE.excludedThisWeek = STATE.excludedThisWeek.filter(c=>c!==cid);
+      saveState(); render(); break;
+    }
+    case 'quickadd-adhoc': {
+      const name = el.dataset.name;
+      if(name){
+        STATE.adHocItems[uid()] = { name, dealer:null, price:null, qty:1, note:'', addedAt: todayISO() };
+        saveState();
+      }
+      QUICKADD_QUERY = '';
+      render(); break;
+    }
+    case 'delete-adhoc': delete STATE.adHocItems[el.dataset.id]; saveState(); render(); break;
+    case 'set-language': STATE.language = el.dataset.lang; saveState(); render(); break;
+  }
+}
+function onChange(e){
+  if(e.target.matches('[data-action="move-dealer"]')){
+    const cid = e.target.dataset.cid, val = e.target.value;
+    if(val){ STATE.basketOverrides[cid] = val; saveState(); render(); }
+  }
+  if(e.target.matches('[data-action="move-dealer-adhoc"]')){
+    const id = e.target.dataset.id, val = e.target.value;
+    if(val && STATE.adHocItems[id]){ STATE.adHocItems[id].dealer = val; saveState(); render(); }
+  }
+  if(e.target.id==='import-file'){
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try{
+        const imported = JSON.parse(ev.target.result);
+        STATE = Object.assign(defaultState(), imported);
+        saveState(); render();
+      }catch(err){ alert(t('importAlertError')); }
+    };
+    reader.readAsText(file);
+  }
+}
+function addCustomProduct(){
+  const name = document.getElementById('custom-name').value.trim();
+  const category = document.getElementById('custom-category').value;
+  const basis = document.getElementById('custom-basis').value;
+  const terms = document.getElementById('custom-terms').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!name || !terms.length) return;
+  const cid = 'custom-'+name.toLowerCase().replace(/[^a-z0-9æøå]+/gi,'-').replace(/(^-|-$)/g,'')+'-'+uid().slice(1,5);
+  STATE.customProducts[cid] = { displayName:name, category, compareBasis:basis, matchTerms:terms, excludeTerms:[], cadenceDays:14 };
+  STATE.favorites[cid] = { cadenceDays:14, typicalQty:1, addedAt:todayISO() };
+  saveState(); render();
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(STATE,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'tilbudtracker-data-'+todayISO()+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* =========================================================================
+   BOOT
+   ========================================================================= */
+(async function boot(){
+  document.getElementById('app').innerHTML = `<div class="empty-state">${t('loadingWeek')}</div>`;
+  bindDelegatedListenersOnce();
+  await loadData();
+  resetWeekIfNeeded();
+  rebuildProductIndex();
+  render();
+})();
+</script>
+
+</body>
+</html>

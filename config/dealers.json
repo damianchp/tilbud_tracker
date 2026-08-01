@@ -1,0 +1,11 @@
+{
+  "_comment": "Chains covered by the Prej API (https://prej.dk/api) as of this writing. 365discount is intentionally excluded — Coop (its owner) has no public product feed yet, so Prej lists the chain but carries zero products for it. Revisit if that changes; Prej's /v1/chains endpoint is the place to check.",
+  "dealers": [
+    { "key": "netto",  "name": "Netto",     "prej_chain_slug": "netto",    "color": "#FFE600", "text": "#14171A" },
+    { "key": "rema",   "name": "Rema 1000", "prej_chain_slug": "rema1000", "color": "#E30613", "text": "#FFFFFF" },
+    { "key": "foetex", "name": "føtex",     "prej_chain_slug": "fotex",    "color": "#00274D", "text": "#FFFFFF" }
+  ],
+  "max_calls_per_run": 20,
+  "request_delay_seconds": 0.5,
+  "max_retries": 3
+}

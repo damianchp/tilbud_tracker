@@ -1,0 +1,52 @@
+{
+  "_readme": "This is the shared matching dictionary, committed to the repo. It has NO concept of 'favorite' — that lives per-user in the browser's localStorage (see index.html / tt_state.favorites), so everyone who deploys this app gets their own picks without touching this file. Add new products here when the unmatched-candidates review (My Products tab) surfaces something worth tracking long-term; day-to-day personalization never requires editing this file.",
+  "products": [
+    { "canonical_id": "milk-whole",            "display_name": "Sødmælk",                  "category": "dairy",      "compare_basis": "kr/l",   "default_cadence_days": 7,  "match_terms": ["sødmælk"], "exclude_terms": ["minimælk", "skummet", "kakaomælk"] },
+    { "canonical_id": "milk-skimmed-organic",  "display_name": "Skummetmælk, øko",         "category": "dairy",      "compare_basis": "kr/l",   "default_cadence_days": 7,  "match_terms": ["øko skummetmælk", "økologisk skummetmælk"], "exclude_terms": [] },
+    { "canonical_id": "butter-lurpak-salted",  "display_name": "Lurpak smør, saltet",       "category": "dairy",      "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["lurpak smør", "lurpak saltet"], "exclude_terms": ["smørbar", "let", "letsaltet"] },
+    { "canonical_id": "yoghurt-natural",       "display_name": "Yoghurt naturel",           "category": "dairy",      "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["yoghurt naturel", "tykmælk"], "exclude_terms": ["sukret", "vanilje"] },
+    { "canonical_id": "skyr-natural",          "display_name": "Skyr, naturel",             "category": "dairy",      "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["skyr naturel", "skyr 0%"], "exclude_terms": [] },
+    { "canonical_id": "cheese-danbo",          "display_name": "Danbo ost",                 "category": "dairy",      "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["danbo"], "exclude_terms": [] },
+    { "canonical_id": "eggs-10",               "display_name": "Æg, 10 stk",                 "category": "dairy",      "compare_basis": "kr/stk", "default_cadence_days": 7,  "match_terms": ["æg 10", "æg m10", "friland æg"], "exclude_terms": [] },
+    { "canonical_id": "creme-fraiche",         "display_name": "Crème fraîche, 18%",        "category": "dairy",      "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["creme fraiche", "crème fraîche"], "exclude_terms": ["let", "9%"] },
+
+    { "canonical_id": "chicken-whole",         "display_name": "Kylling, hel",              "category": "meat",       "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["hel kylling", "grillkylling"], "exclude_terms": ["bryst", "lår"] },
+    { "canonical_id": "chicken-breast",        "display_name": "Kyllingebryst",             "category": "meat",       "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["kyllingebryst", "kyllingefilet"], "exclude_terms": [] },
+    { "canonical_id": "beef-minced-8-12",      "display_name": "Hakket oksekød, 8-12%",     "category": "meat",       "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["hakket oksekød 8-12", "hakket oksekød 10%", "hakket okse 8-12"], "exclude_terms": ["3-7%", "kalv"] },
+    { "canonical_id": "pork-minced",           "display_name": "Hakket svinekød",           "category": "meat",       "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["hakket svinekød", "hakket flæsk"], "exclude_terms": [] },
+    { "canonical_id": "bacon",                 "display_name": "Bacon, skiver",             "category": "meat",       "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["bacon"], "exclude_terms": ["kalkun"] },
+    { "canonical_id": "salmon-fillet",         "display_name": "Laksefilet",                "category": "fish",       "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["laksefilet", "laks filet"], "exclude_terms": ["røget"] },
+
+    { "canonical_id": "bread-rye",             "display_name": "Rugbrød",                   "category": "bakery",     "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["rugbrød"], "exclude_terms": ["knækbrød"] },
+    { "canonical_id": "bread-wheat",           "display_name": "Franskbrød / toastbrød",    "category": "bakery",     "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["franskbrød", "toastbrød", "flütes"], "exclude_terms": [] },
+
+    { "canonical_id": "banana",                "display_name": "Bananer",                   "category": "produce",    "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["bananer"], "exclude_terms": ["økologisk bananer"] },
+    { "canonical_id": "apple",                 "display_name": "Æbler",                     "category": "produce",    "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["æbler"], "exclude_terms": [] },
+    { "canonical_id": "avocado",               "display_name": "Avocado",                   "category": "produce",    "compare_basis": "kr/stk", "default_cadence_days": 7,  "match_terms": ["avocado"], "exclude_terms": [] },
+    { "canonical_id": "tomato",                "display_name": "Tomater",                   "category": "produce",    "compare_basis": "kr/kg",  "default_cadence_days": 7,  "match_terms": ["tomater", "cherrytomater"], "exclude_terms": ["dåse", "flåede"] },
+    { "canonical_id": "cucumber",               "display_name": "Agurk",                     "category": "produce",    "compare_basis": "kr/stk", "default_cadence_days": 7,  "match_terms": ["agurk"], "exclude_terms": [] },
+    { "canonical_id": "onion",                 "display_name": "Løg",                       "category": "produce",    "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["gule løg", "kartoffelløg"], "exclude_terms": ["rødløg", "forårsløg"] },
+    { "canonical_id": "potato",                "display_name": "Kartofler",                 "category": "produce",    "compare_basis": "kr/kg",  "default_cadence_days": 14, "match_terms": ["kartofler"], "exclude_terms": ["pomfritter"] },
+    { "canonical_id": "lime",                  "display_name": "Limefrugt",                 "category": "produce",    "compare_basis": "kr/stk", "default_cadence_days": 14, "match_terms": ["lime"], "exclude_terms": [] },
+    { "canonical_id": "coriander",             "display_name": "Koriander, frisk",          "category": "produce",    "compare_basis": "kr/stk", "default_cadence_days": 14, "match_terms": ["koriander"], "exclude_terms": [] },
+
+    { "canonical_id": "coffee-filter",         "display_name": "Filterkaffe",               "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 21, "match_terms": ["gevalia", "merrild", "filterkaffe"], "exclude_terms": ["kapsler", "pods"] },
+    { "canonical_id": "oats-rolled",           "display_name": "Havregryn",                 "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 30, "match_terms": ["havregryn"], "exclude_terms": [] },
+    { "canonical_id": "pasta",                 "display_name": "Pasta",                     "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 30, "match_terms": ["pasta", "spaghetti", "penne"], "exclude_terms": [] },
+    { "canonical_id": "rice",                  "display_name": "Ris",                       "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 30, "match_terms": ["ris basmati", "jasminris", "ris "], "exclude_terms": ["risengrød"] },
+    { "canonical_id": "black-beans-canned",    "display_name": "Sorte bønner, dåse",        "category": "pantry",     "compare_basis": "kr/stk", "default_cadence_days": 21, "match_terms": ["sorte bønner"], "exclude_terms": [] },
+    { "canonical_id": "olive-oil",             "display_name": "Olivenolie",                "category": "pantry",     "compare_basis": "kr/l",   "default_cadence_days": 30, "match_terms": ["olivenolie"], "exclude_terms": [] },
+    { "canonical_id": "ketchup",               "display_name": "Ketchup",                   "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 30, "match_terms": ["ketchup"], "exclude_terms": [] },
+    { "canonical_id": "mayo",                  "display_name": "Mayonnaise",                "category": "pantry",     "compare_basis": "kr/kg",  "default_cadence_days": 30, "match_terms": ["mayonnaise", "let mayo"], "exclude_terms": [] },
+
+    { "canonical_id": "laundry-liquid",        "display_name": "Flydende vaskemiddel",      "category": "household",  "compare_basis": "kr/l",   "default_cadence_days": 30, "match_terms": ["flydende vaskemiddel", "vaskemiddel color", "vaskemiddel hvid"], "exclude_terms": ["skyllemiddel"] },
+    { "canonical_id": "dishwasher-tabs",       "display_name": "Opvasketabs",               "category": "household",  "compare_basis": "kr/stk", "default_cadence_days": 30, "match_terms": ["opvasketabs", "opvasketab"], "exclude_terms": [] },
+    { "canonical_id": "toilet-paper",          "display_name": "Toiletpapir",               "category": "household",  "compare_basis": "kr/stk", "default_cadence_days": 30, "match_terms": ["toiletpapir"], "exclude_terms": [] },
+    { "canonical_id": "paper-towel",           "display_name": "Køkkenrulle",               "category": "household",  "compare_basis": "kr/stk", "default_cadence_days": 30, "match_terms": ["køkkenrulle"], "exclude_terms": [] },
+    { "canonical_id": "trash-bags",            "display_name": "Skraldeposer",              "category": "household",  "compare_basis": "kr/stk", "default_cadence_days": 45, "match_terms": ["skraldeposer", "affaldsposer"], "exclude_terms": [] },
+    { "canonical_id": "dish-soap",             "display_name": "Opvaskemiddel",             "category": "household",  "compare_basis": "kr/l",   "default_cadence_days": 30, "match_terms": ["opvaskemiddel"], "exclude_terms": ["opvasketabs"] },
+
+    { "canonical_id": "diapers",               "display_name": "Bleer",                     "category": "baby",       "compare_basis": "kr/stk", "default_cadence_days": 14, "match_terms": ["bleer str"], "exclude_terms": ["svømmeble"] },
+    { "canonical_id": "wet-wipes",             "display_name": "Vådservietter",             "category": "baby",       "compare_basis": "kr/stk", "default_cadence_days": 21, "match_terms": ["vådservietter"], "exclude_terms": [] }
+  ]
+}
