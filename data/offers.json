@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-01T20:05:13Z",
+  "generated_at": "2026-08-01T20:25:58Z",
   "week": "2026-W31",
   "dealers_failed": [],
   "offers": [
@@ -18,7 +18,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=M%C3%86LK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -37,7 +37,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=M%C3%86LK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -56,7 +56,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=M%C3%86LK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -75,7 +75,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=M%C3%86LK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -96,7 +96,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=SM%C3%98R",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -117,7 +117,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=SM%C3%98R",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -136,7 +136,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=SM%C3%98R",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -157,7 +157,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=SM%C3%98R",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -176,7 +176,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RUGBR%C3%98D",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -197,7 +197,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RUGBR%C3%98D",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -216,7 +216,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RUGBR%C3%98D",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -237,7 +237,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86G",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -256,7 +256,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86G",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -275,7 +275,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86G",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -296,7 +296,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KYLLING",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -317,7 +317,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KYLLING",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -338,7 +338,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KYLLING",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -357,7 +357,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KYLLING",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -378,7 +378,7 @@
       "flags": [
         "offer_ends:2026-08-03"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OKSE",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -399,7 +399,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OKSE",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -420,7 +420,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OKSE",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -439,7 +439,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KAFFE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -458,7 +458,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KAFFE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -477,7 +477,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=KAFFE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -496,7 +496,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=HAVRE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -515,7 +515,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=HAVRE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -534,7 +534,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=PASTA",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -553,7 +553,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=PASTA",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -572,7 +572,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RIS",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -593,7 +593,7 @@
       "flags": [
         "offer_ends:2026-08-03"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RIS",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -612,7 +612,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RIS",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -631,7 +631,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=RIS",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -650,7 +650,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=YOGHURT",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -671,7 +671,7 @@
       "flags": [
         "offer_ends:2026-08-07"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=YOGHURT",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -690,7 +690,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=YOGHURT",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -709,7 +709,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=YOGHURT",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -728,7 +728,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OST",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -749,7 +749,7 @@
       "flags": [
         "offer_ends:2026-08-03"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OST",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -768,7 +768,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OST",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -787,7 +787,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=BANAN",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -806,7 +806,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=BANAN",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -825,7 +825,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=BANAN",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -844,7 +844,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=BANAN",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -863,7 +863,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86BLE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -882,7 +882,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86BLE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -901,7 +901,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86BLE",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -922,7 +922,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=%C3%86BLE",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -941,7 +941,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOMAT",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -960,7 +960,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOMAT",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -981,7 +981,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOMAT",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -1002,7 +1002,7 @@
       "flags": [
         "offer_ends:2026-08-05"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=VASK",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     },
@@ -1021,7 +1021,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=VASK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1040,7 +1040,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOILET",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1059,7 +1059,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOILET",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1078,7 +1078,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=TOILET",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1097,7 +1097,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OPVASK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1116,7 +1116,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OPVASK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1135,7 +1135,7 @@
       "valid_from": null,
       "valid_to": null,
       "flags": [],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OPVASK",
       "source": "scraped",
       "last_seen_date": "2026-08-01"
     },
@@ -1156,7 +1156,7 @@
       "flags": [
         "offer_ends:2026-08-03"
       ],
-      "image": null,
+      "image": "https://placehold.co/200x200/232830/4AFF8C?font=roboto&text=OPVASK",
       "source": "flyer",
       "last_seen_date": "2026-08-01"
     }

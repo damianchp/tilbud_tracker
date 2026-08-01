@@ -18,6 +18,7 @@ Deterministic (fixed random seed) so re-running produces the same demo.
 
 import json
 import random
+import urllib.parse
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -33,6 +34,25 @@ CHAIN_NAME = {"netto": "Netto", "rema": "Rema 1000", "foetex": "føtex", "lidl":
 
 # (canonical_id, prej_id, name, brand, unit, quantity, base_price_dkk)
 # base_price is the "normal, no promo" price this product tends to sell at.
+PLACEHOLDER_LABELS = {
+    "milk-whole": "MÆLK", "butter-lurpak-salted": "SMØR", "bread-rye": "RUGBRØD",
+    "eggs-10": "ÆG", "chicken-whole": "KYLLING", "beef-minced-8-12": "OKSE",
+    "coffee-filter": "KAFFE", "oats-rolled": "HAVRE", "pasta": "PASTA",
+    "rice": "RIS", "yoghurt-natural": "YOGHURT", "cheese-danbo": "OST",
+    "banana": "BANAN", "apple": "ÆBLE", "tomato": "TOMAT",
+    "laundry-liquid": "VASK", "toilet-paper": "TOILET", "dishwasher-tabs": "OPVASK",
+}
+
+
+def placeholder_image_url(cid: str) -> str:
+    """Demo-only: an honestly-labeled placeholder (placehold.co), styled to
+    match the app, NOT a stand-in claiming to be a real product photo. Real
+    deployments get genuine per-retailer images from Prej's image_url field
+    (already wired into fetch_offers.py) — nothing needed there."""
+    label = urllib.parse.quote(PLACEHOLDER_LABELS.get(cid, cid.upper()[:10]))
+    return f"https://placehold.co/200x200/232830/4AFF8C?font=roboto&text={label}"
+
+
 PRODUCTS = [
     ("milk-whole",           10001, "Sødmælk 1 l",                    "Arla",     "l",  1,    11.95),
     ("butter-lurpak-salted", 10002, "Smør Saltet 200 g",              "Lurpak",   "g",  200,  24.95),
@@ -141,7 +161,7 @@ def build_demo_batch():
                 "chain_slug": CHAIN_SLUG[dealer],
                 "chain_name": CHAIN_NAME[dealer],
                 "chain_logo_url": None,
-                "image_url": None,
+                "image_url": placeholder_image_url(cid),
                 "unit": unit if unit != "stk" else None,
                 "quantity": qty if unit != "stk" else None,
                 "price": round(price_dkk * 100),          # øre
@@ -158,7 +178,7 @@ def build_demo_batch():
             "name": name,
             "description": None,
             "brand": brand,
-            "image_url": None,
+            "image_url": placeholder_image_url(cid),
             "unit": unit if unit != "stk" else None,
             "quantity": qty if unit != "stk" else None,
             "organic": False,
