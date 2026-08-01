@@ -282,7 +282,7 @@ def process_batch(products: list, catalog: dict, dealer_keys_by_slug: dict,
         for price in product.get("prices") or []:
             dealer_key = dealer_keys_by_slug.get(price.get("chain_slug"))
             if not dealer_key:
-                continue  # a chain we're not tracking (Prej covers 18+, we track 3)
+                continue  # a chain we're not tracking (Prej covers 18+, we track a handful)
             price_dkk = (price.get("price") or 0) / 100
             unit_price_dkk = (price["unit_price"] / 100) if price.get("unit_price") is not None else None
             basis = unit_price_basis_from_unit(price.get("unit"))
@@ -322,7 +322,7 @@ def process_batch(products: list, catalog: dict, dealer_keys_by_slug: dict,
 
     for cid, points in price_history.items():
         points.sort(key=lambda p: p["date"])
-        cap = HISTORY_WEEKS_CAP * 7 * 3  # ~52 weeks * ~daily runs * 3 chains, generous cap
+        cap = HISTORY_WEEKS_CAP * 7 * 4  # ~52 weeks * ~daily runs * 4 chains, generous cap
         if len(points) > cap:
             price_history[cid] = points[-cap:]
 

@@ -27,9 +27,9 @@ SCRIPTS_DIR = ROOT / "scripts"
 
 random.seed(42)
 
-DEALERS = ["netto", "rema", "foetex"]
-CHAIN_SLUG = {"netto": "netto", "rema": "rema1000", "foetex": "fotex"}
-CHAIN_NAME = {"netto": "Netto", "rema": "Rema 1000", "foetex": "føtex"}
+DEALERS = ["netto", "rema", "foetex", "lidl"]
+CHAIN_SLUG = {"netto": "netto", "rema": "rema1000", "foetex": "fotex", "lidl": "lidl"}
+CHAIN_NAME = {"netto": "Netto", "rema": "Rema 1000", "foetex": "føtex", "lidl": "Lidl"}
 
 # (canonical_id, prej_id, name, brand, unit, quantity, base_price_dkk)
 # base_price is the "normal, no promo" price this product tends to sell at.
@@ -55,7 +55,7 @@ PRODUCTS = [
 ]
 
 # Per-dealer relative price index (dealers aren't identical even off-promo)
-DEALER_INDEX = {"netto": 1.00, "rema": 0.98, "foetex": 1.06}
+DEALER_INDEX = {"netto": 1.00, "rema": 0.98, "foetex": 1.06, "lidl": 0.94}
 
 TODAY = date.today()
 WEEKS_OF_HISTORY = 8
@@ -84,7 +84,7 @@ def build_history():
         history[cid] = []
         for w in range(WEEKS_OF_HISTORY, 0, -1):
             wk_date = TODAY - timedelta(weeks=w)
-            n_dealers_this_week = random.choice([1, 2, 2, 3])
+            n_dealers_this_week = random.choice([1, 2, 2, 3, 4])
             dealers_this_week = random.sample(DEALERS, n_dealers_this_week)
             for dealer in dealers_this_week:
                 idx = DEALER_INDEX[dealer]
@@ -112,11 +112,11 @@ def build_demo_batch():
     products = []
 
     story = {
-        "beef-minced-8-12": {"netto": 0.60, "rema": 0.62, "foetex": None},   # excellent, stock-up
-        "laundry-liquid":   {"netto": None, "rema": 0.58, "foetex": 0.97},  # excellent at Rema only
-        "butter-lurpak-salted": {"netto": 0.76, "rema": 0.80, "foetex": 1.0},
-        "coffee-filter":    {"netto": 0.95, "rema": None, "foetex": 0.93},  # weak/fake-ish offer
-        "milk-whole":       {"netto": 1.0, "rema": 0.98, "foetex": 1.04},   # normal, always-on
+        "beef-minced-8-12": {"netto": 0.60, "rema": 0.62, "foetex": None, "lidl": 0.64},   # excellent, stock-up
+        "laundry-liquid":   {"netto": None, "rema": 0.58, "foetex": 0.97, "lidl": None},   # excellent at Rema only
+        "butter-lurpak-salted": {"netto": 0.76, "rema": 0.80, "foetex": 1.0, "lidl": 0.74}, # Lidl actually cheapest here
+        "coffee-filter":    {"netto": 0.95, "rema": None, "foetex": 0.93, "lidl": 0.90},   # weak/fake-ish offer
+        "milk-whole":       {"netto": 1.0, "rema": 0.98, "foetex": 1.04, "lidl": 0.95},    # normal, always-on
     }
 
     for cid, pid, name, brand, unit, qty, base_price in PRODUCTS:

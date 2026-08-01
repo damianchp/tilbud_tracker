@@ -1,6 +1,6 @@
 # TilbudTracker
 
-Grocery price aggregator for Netto, Rema 1000, and føtex. Tracks the
+Grocery price aggregator for Netto, Rema 1000, føtex, and Lidl. Tracks the
 products your household actually buys, ranks the cheapest chain per item,
 builds a per-chain shopping basket, and tells you whether a given price is
 actually good or just a normal one — based on your own accumulated price
@@ -139,7 +139,7 @@ translate.
 tilbud-tracker/
 ├── index.html                     the whole app: one file, no build step,
 │                                   no framework, no external JS dependency
-├── config/dealers.json            the 3 chains + their Prej chain slugs
+├── config/dealers.json            the 4 chains + their Prej chain slugs
 ├── data/
 │   ├── catalog.json                shared matching dictionary (~40 Danish
 │   │                                grocery staples) — committed to the
@@ -175,7 +175,7 @@ run picks them up.
 
 **Deal-quality scoring:** once a product has 6+ historical price points,
 its current price is scored by percentile against its own trailing history
-(any of the 3 chains) — ≤10th percentile = *Best price*, ≤35th = *Good
+(any of the tracked chains) — ≤10th percentile = *Best price*, ≤35th = *Good
 price*, ≤65th = *Normal price*, else *Rarely this cheap*. Before there's
 enough history (a few days after first tracking something), it falls back
 to whether Prej flagged the price with an offer end date at all.
