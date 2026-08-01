@@ -1,0 +1,35 @@
+name: Fetch weekly offers
+
+on:
+  schedule:
+    # Prej's free tier is 25 requests/day; one run/day (the batch refresh
+    # is a single call) comfortably fits, with headroom for the bootstrap
+    # step to keep discovering newly-added products over several runs.
+    - cron: "0 5 * * *"   # 05:00 UTC ≈ 06:00 CET / 07:00 CEST
+  workflow_dispatch: {}   # lets you trigger a manual run from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run fetch pipeline
+        env:
+          PREJ_API_KEY: ${{ secrets.PREJ_API_KEY }}
+        run: python3 scripts/fetch_offers.py --live
+
+      - name: Commit updated data if changed
+        run: |
+          git config user.name "tilbud-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/offers.json data/price_history.json data/catalog.json data/unmatched_candidates.json
+          git diff --cached --quiet || git commit -m "offers: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
